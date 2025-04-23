@@ -1,11 +1,6 @@
 framework:
     workflows:
         !php/const Sylius\Component\Shipping\ShipmentTransitions::GRAPH:
-            type: state_machine
-            initial_marking: !php/const Sylius\Component\Shipping\Model\ShipmentInterface::STATE_CART
-            places:
-                - !php/const Sylius\Component\Shipping\Model\ShipmentInterface::STATE_CART
-                - !php/const Sylius\Component\Shipping\Model\ShipmentInterface::STATE_SHIPPED
             transitions:
                 !php/const Sylius\MolliePlugin\StateMachine\ShipmentTransitions::TRANSITION_CREATE_AND_SHIP:
                     from: !php/const Sylius\Component\Shipping\Model\ShipmentInterface::STATE_CART
