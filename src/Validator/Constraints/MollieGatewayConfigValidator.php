@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Sylius\MolliePlugin\Validator\Constraints;
 
 use Doctrine\ORM\PersistentCollection;
+use Sylius\MolliePlugin\Entity\MollieGatewayConfigInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Webmozart\Assert\Assert;
@@ -26,54 +27,100 @@ final class MollieGatewayConfigValidator extends ConstraintValidator
 
     private const AMOUNT_LIMITS_FIELD = 'amountLimits';
 
-    private const FIELD_VALUE = 'value';
-
     public function validate(mixed $value, Constraint $constraint): void
     {
         Assert::isInstanceOf($constraint, MollieGatewayConfigValidatorType::class);
 
-        if ($value instanceof PersistentCollection) {
-            $this->validateAmounts($value, $constraint);
+        if (!$value instanceof PersistentCollection) {
+            return;
         }
-    }
 
-    private function validateAmounts(PersistentCollection $collection, MollieGatewayConfigValidatorType $constraint): void
-    {
-        $mollieGatewayConfigs = $collection->getSnapshot();
-        foreach ($mollieGatewayConfigs as $key => $mollieGatewayConfig) {
-            $amountLimits = $mollieGatewayConfig->getAmountLimits();
-            if (!$amountLimits) {
+        /** @var MollieGatewayConfigInterface[] $configs */
+        $configs = $value->getSnapshot();
+
+        foreach ($configs as $index => $config) {
+            $limits = $config->getAmountLimits();
+            if ($limits === null) {
                 continue;
             }
 
-            $minAmount = $amountLimits->getMinimumAmount();
-            $maxAmount = $amountLimits->getMaximumAmount();
+            $configMinimum = $limits->getMinimumAmount();
+            $configMaximum = $limits->getMaximumAmount();
 
-            if ($minAmount !== null && $maxAmount !== null && $minAmount > $maxAmount) {
+            if ($configMinimum !== null && $configMaximum !== null && $configMinimum > $configMaximum) {
                 $this->context->buildViolation($constraint->minGreaterThanMaxMessage)
-                    ->atPath("[{$key}]." . self::AMOUNT_LIMITS_FIELD . '.' . self::MAXIMUM_FIELD)
+                    ->atPath("[{$index}]." . self::AMOUNT_LIMITS_FIELD . '.' . self::MAXIMUM_FIELD)
                     ->addViolation();
+
+                continue;
             }
 
-            if ($minAmount !== null && $mollieGatewayConfig->getMinimumAmount()) {
-                $mollieMinAmount = $mollieGatewayConfig->getMinimumAmount()[self::FIELD_VALUE];
-                if ($mollieMinAmount !== null && $mollieMinAmount > $minAmount) {
-                    $this->context->buildViolation($constraint->minLessThanMollieMinMessage)
-                        ->setParameter('%amount%', $mollieMinAmount)
-                        ->atPath("[{$key}]." . self::AMOUNT_LIMITS_FIELD . '.' . self::MINIMUM_FIELD)
-                        ->addViolation();
+            if ($configMinimum !== null) {
+                $apiMinimum = $config->getMinimumAmount()['value'] ?? null;
+                if ($apiMinimum === null) {
+                    continue;
                 }
+
+                $this->validateConfigMinimumNotBelowApiMinimum(
+                    $configMinimum,
+                    (float) $apiMinimum,
+                    $constraint,
+                    $index,
+                );
             }
 
-            if ($maxAmount !== null && $mollieGatewayConfig->getMaximumAmount()) {
-                $mollieMaxAmount = $mollieGatewayConfig->getMaximumAmount()[self::FIELD_VALUE];
-                if ($mollieMaxAmount !== null && $mollieMaxAmount < $maxAmount) {
-                    $this->context->buildViolation($constraint->maxGreaterThanMollieMaxMessage)
-                        ->setParameter('%amount%', $mollieMaxAmount)
-                        ->atPath("[{$key}]." . self::AMOUNT_LIMITS_FIELD . '.' . self::MAXIMUM_FIELD)
-                        ->addViolation();
+            if ($configMaximum === null) {
+                continue;
+            }
+
+            $apiMaximum = $config->getMaximumAmount()['value'] ?? null;
+            if ($apiMaximum !== null) {
+                if ($this->shouldSkipMaximumValidation($config->getMethodId())) {
+                    continue;
                 }
+
+                $this->validateConfigMaximumNotAboveApiMaximum(
+                    $configMaximum,
+                    (float) $apiMaximum,
+                    $constraint,
+                    $index,
+                );
             }
         }
+    }
+
+    /** @param MollieGatewayConfigValidatorType $constraint */
+    private function validateConfigMinimumNotBelowApiMinimum(
+        float $configMinimum,
+        float $apiMinimum,
+        Constraint $constraint,
+        int $index,
+    ): void {
+        if ($configMinimum < $apiMinimum) {
+            $this->context->buildViolation($constraint->minLessThanMollieMinMessage)
+                ->setParameter('%amount%', (string) $apiMinimum)
+                ->atPath("[{$index}]." . self::AMOUNT_LIMITS_FIELD . '.' . self::MINIMUM_FIELD)
+                ->addViolation();
+        }
+    }
+
+    /** @param MollieGatewayConfigValidatorType $constraint */
+    private function validateConfigMaximumNotAboveApiMaximum(
+        float $configMaximum,
+        float $apiMaximum,
+        Constraint $constraint,
+        int $index,
+    ): void {
+        if ($configMaximum > $apiMaximum) {
+            $this->context->buildViolation($constraint->maxGreaterThanMollieMaxMessage)
+                ->setParameter('%amount%', (string) $apiMaximum)
+                ->atPath("[{$index}]." . self::AMOUNT_LIMITS_FIELD . '.' . self::MAXIMUM_FIELD)
+                ->addViolation();
+        }
+    }
+
+    private function shouldSkipMaximumValidation(?string $paymentMethodName = null): bool
+    {
+        return $paymentMethodName === 'creditcard';
     }
 }
