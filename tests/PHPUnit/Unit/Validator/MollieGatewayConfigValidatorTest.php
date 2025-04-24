@@ -102,22 +102,22 @@ final class MollieGatewayConfigValidatorTest extends ConstraintValidatorTestCase
     /** @dataProvider providePaymentMethodConfigurations */
     public function testConfigMinimumLessThanApiMinimum(
         string $paymentMethod,
-        ?float $apiMinimum = null,
-        ?float $apiMaximum = null,
+        ?float $apiMinimumAmount = null,
+        ?float $apiMaximumAmount = null,
     ): void {
-        if ($apiMinimum === null) {
+        if ($apiMinimumAmount === null) {
             $this->assertNoViolation();
 
             return;
         }
 
         $this->setupPaymentMethod($paymentMethod);
-        $this->setupApiAmountLimits($apiMinimum, $apiMaximum);
-        $this->setupConfigAmountLimits(minimum: $apiMinimum - 0.01);
+        $this->setupApiAmountLimits($apiMinimumAmount, $apiMaximumAmount);
+        $this->setupConfigAmountLimits(minimum: $apiMinimumAmount - 0.01);
 
         $this->validator->validate($this->createPersistentCollection(), $this->constraint);
         $this->buildViolation($this->constraint->minLessThanMollieMinMessage)
-            ->setParameter('%amount%', (string) $apiMinimum)
+            ->setParameter('%amount%', (string) $apiMinimumAmount)
             ->atPath('property.path[0].amountLimits.minimumAmount')
             ->assertRaised()
         ;
@@ -126,12 +126,12 @@ final class MollieGatewayConfigValidatorTest extends ConstraintValidatorTestCase
     /** @dataProvider providePaymentMethodConfigurations */
     public function testConfigMinimumEqualApiMinimum(
         string $paymentMethod,
-        ?float $apiMinimum = null,
-        ?float $apiMaximum = null,
+        ?float $apiMinimumAmount = null,
+        ?float $apiMaximumAmount = null,
     ): void {
         $this->setupPaymentMethod($paymentMethod);
-        $this->setupApiAmountLimits($apiMinimum, $apiMaximum);
-        $this->setupConfigAmountLimits(minimum: $apiMinimum);
+        $this->setupApiAmountLimits($apiMinimumAmount, $apiMaximumAmount);
+        $this->setupConfigAmountLimits(minimum: $apiMinimumAmount);
 
         $this->validator->validate($this->createPersistentCollection(), $this->constraint);
         $this->assertNoViolation();
@@ -140,12 +140,12 @@ final class MollieGatewayConfigValidatorTest extends ConstraintValidatorTestCase
     /** @dataProvider providePaymentMethodConfigurations */
     public function testConfigMinimumGreaterThanApiMinimum(
         string $paymentMethod,
-        ?float $apiMinimum = null,
-        ?float $apiMaximum = null,
+        ?float $apiMinimumAmount = null,
+        ?float $apiMaximumAmount = null,
     ): void {
         $this->setupPaymentMethod($paymentMethod);
-        $this->setupApiAmountLimits($apiMinimum, $apiMaximum);
-        $this->setupConfigAmountLimits(minimum: $apiMinimum + 0.01);
+        $this->setupApiAmountLimits($apiMinimumAmount, $apiMaximumAmount);
+        $this->setupConfigAmountLimits(minimum: $apiMinimumAmount + 0.01);
 
         $this->validator->validate($this->createPersistentCollection(), $this->constraint);
         $this->assertNoViolation();
@@ -154,12 +154,12 @@ final class MollieGatewayConfigValidatorTest extends ConstraintValidatorTestCase
     /** @dataProvider providePaymentMethodConfigurations */
     public function testConfigMaximumLessThanApiMaximum(
         string $paymentMethod,
-        ?float $apiMinimum = null,
-        ?float $apiMaximum = null,
+        ?float $apiMinimumAmount = null,
+        ?float $apiMaximumAmount = null,
     ): void {
         $this->setupPaymentMethod($paymentMethod);
-        $this->setupApiAmountLimits($apiMinimum, $apiMaximum);
-        $this->setupConfigAmountLimits(maximum: $apiMaximum - 0.01);
+        $this->setupApiAmountLimits($apiMinimumAmount, $apiMaximumAmount);
+        $this->setupConfigAmountLimits(maximum: $apiMaximumAmount - 0.01);
 
         $this->validator->validate($this->createPersistentCollection(), $this->constraint);
         $this->assertNoViolation();
@@ -168,12 +168,12 @@ final class MollieGatewayConfigValidatorTest extends ConstraintValidatorTestCase
     /** @dataProvider providePaymentMethodConfigurations */
     public function testConfigMaximumEqualApiMaximum(
         string $paymentMethod,
-        ?float $apiMinimum = null,
-        ?float $apiMaximum = null,
+        ?float $apiMinimumAmount = null,
+        ?float $apiMaximumAmount = null,
     ): void {
         $this->setupPaymentMethod($paymentMethod);
-        $this->setupApiAmountLimits($apiMinimum, $apiMaximum);
-        $this->setupConfigAmountLimits(maximum: $apiMaximum);
+        $this->setupApiAmountLimits($apiMinimumAmount, $apiMaximumAmount);
+        $this->setupConfigAmountLimits(maximum: $apiMaximumAmount);
 
         $this->validator->validate($this->createPersistentCollection(), $this->constraint);
         $this->assertNoViolation();
@@ -182,18 +182,18 @@ final class MollieGatewayConfigValidatorTest extends ConstraintValidatorTestCase
     /** @dataProvider providePaymentMethodConfigurations */
     public function testConfigMaximumGreaterThanApiMaximum(
         string $paymentMethod,
-        ?float $apiMinimum = null,
-        ?float $apiMaximum = null,
+        ?float $apiMinimumAmount = null,
+        ?float $apiMaximumAmount = null,
     ): void {
-        if ($apiMaximum === null) {
+        if ($apiMaximumAmount === null) {
             $this->assertNoViolation();
 
             return;
         }
 
         $this->setupPaymentMethod($paymentMethod);
-        $this->setupApiAmountLimits($apiMinimum, $apiMaximum);
-        $this->setupConfigAmountLimits(maximum: $apiMaximum + 0.01);
+        $this->setupApiAmountLimits($apiMinimumAmount, $apiMaximumAmount);
+        $this->setupConfigAmountLimits(maximum: $apiMaximumAmount + 0.01);
 
         $this->validator->validate($this->createPersistentCollection(), $this->constraint);
 
@@ -204,7 +204,7 @@ final class MollieGatewayConfigValidatorTest extends ConstraintValidatorTestCase
         }
 
         $this->buildViolation($this->constraint->maxGreaterThanMollieMaxMessage)
-            ->setParameter('%amount%', (string) $apiMaximum)
+            ->setParameter('%amount%', (string) $apiMaximumAmount)
             ->atPath('property.path[0].amountLimits.maximumAmount')
             ->assertRaised()
         ;
@@ -241,8 +241,8 @@ final class MollieGatewayConfigValidatorTest extends ConstraintValidatorTestCase
     /**
      * Each entry is a 3-element tuple:
      *   [0] string $paymentMethod Mollie payment method identifier
-     *   [1] float $apiMinimum Minimum amount defined by Mollie API
-     *   [2] float|null $apiMaximum Maximum amount defined by Mollie API (null = no upper bound)
+     *   [1] float $apiMinimumAmount Minimum amount defined by Mollie API
+     *   [2] float|null $apiMaximumAmount Maximum amount defined by Mollie API (null = no upper bound)
      *
      * @return array<int, array{string, float, float|null}>
      */

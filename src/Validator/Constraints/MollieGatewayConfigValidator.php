@@ -45,10 +45,10 @@ final class MollieGatewayConfigValidator extends ConstraintValidator
                 continue;
             }
 
-            $configMinimum = $amountLimits->getMinimumAmount();
-            $configMaximum = $amountLimits->getMaximumAmount();
+            $limitMinimumAmount = $amountLimits->getMinimumAmount();
+            $limitMaximumAmount = $amountLimits->getMaximumAmount();
 
-            if ($configMinimum !== null && $configMaximum !== null && $configMinimum > $configMaximum) {
+            if ($limitMinimumAmount !== null && $limitMaximumAmount !== null && $limitMinimumAmount > $limitMaximumAmount) {
                 $this->context->buildViolation($constraint->minGreaterThanMaxMessage)
                     ->atPath("[{$index}]." . self::AMOUNT_LIMITS_FIELD . '.' . self::MAXIMUM_FIELD)
                     ->addViolation();
@@ -56,30 +56,30 @@ final class MollieGatewayConfigValidator extends ConstraintValidator
                 continue;
             }
 
-            if ($configMinimum !== null) {
-                $apiMinimum = $config->getMinimumAmount()['value'] ?? null;
-                if ($apiMinimum !== null) {
+            if ($limitMinimumAmount !== null) {
+                $apiMinimumAmount = $config->getMinimumAmount()['value'] ?? null;
+                if ($apiMinimumAmount !== null) {
                     $this->validateConfigMinimumNotBelowApiMinimum(
-                        $configMinimum,
-                        (float) $apiMinimum,
+                        $limitMinimumAmount,
+                        (float) $apiMinimumAmount,
                         $constraint,
                         $index,
                     );
                 }
             }
 
-            if ($configMaximum === null) {
+            if ($limitMaximumAmount === null) {
                 continue;
             }
 
-            $apiMaximum = $config->getMaximumAmount()['value'] ?? null;
-            if ($apiMaximum === null || $this->shouldSkipMaximumValidation($config->getMethodId())) {
+            $apiMaximumAmount = $config->getMaximumAmount()['value'] ?? null;
+            if ($apiMaximumAmount === null || $this->shouldSkipMaximumValidation($config->getMethodId())) {
                 continue;
             }
 
             $this->validateConfigMaximumNotAboveApiMaximum(
-                $configMaximum,
-                (float) $apiMaximum,
+                $limitMaximumAmount,
+                (float) $apiMaximumAmount,
                 $constraint,
                 $index,
             );
@@ -88,17 +88,17 @@ final class MollieGatewayConfigValidator extends ConstraintValidator
 
     /** @param MollieGatewayConfigValidatorType $constraint */
     private function validateConfigMinimumNotBelowApiMinimum(
-        float $configMinimum,
-        float $apiMinimum,
+        float $limitMinimumAmount,
+        float $apiMinimumAmount,
         Constraint $constraint,
         int $index,
     ): void {
-        if ($configMinimum >= $apiMinimum) {
+        if ($limitMinimumAmount >= $apiMinimumAmount) {
             return;
         }
 
         $this->context->buildViolation($constraint->minLessThanMollieMinMessage)
-            ->setParameter('%amount%', (string) $apiMinimum)
+            ->setParameter('%amount%', (string) $apiMinimumAmount)
             ->atPath("[{$index}]." . self::AMOUNT_LIMITS_FIELD . '.' . self::MINIMUM_FIELD)
             ->addViolation()
         ;
@@ -106,17 +106,17 @@ final class MollieGatewayConfigValidator extends ConstraintValidator
 
     /** @param MollieGatewayConfigValidatorType $constraint */
     private function validateConfigMaximumNotAboveApiMaximum(
-        float $configMaximum,
-        float $apiMaximum,
+        float $limitMaximumAmount,
+        float $apiMaximumAmount,
         Constraint $constraint,
         int $index,
     ): void {
-        if ($configMaximum <= $apiMaximum) {
+        if ($limitMaximumAmount <= $apiMaximumAmount) {
             return;
         }
 
         $this->context->buildViolation($constraint->maxGreaterThanMollieMaxMessage)
-            ->setParameter('%amount%', (string) $apiMaximum)
+            ->setParameter('%amount%', (string) $apiMaximumAmount)
             ->atPath("[{$index}]." . self::AMOUNT_LIMITS_FIELD . '.' . self::MAXIMUM_FIELD)
             ->addViolation()
         ;
