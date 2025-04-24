@@ -16,7 +16,10 @@ namespace Sylius\MolliePlugin\StateMachine;
 final class MollieRecurringTransitions
 {
     public const GRAPH_MANUAL = 'mollie_subscription_payment_graph_manual';
+
     public const TRANSITION_PAUSE = 'pause';
+
     public const TRANSITION_RESUME = 'resume';
+
     public const TRANSITION_CANCEL = 'cancel';
 }
