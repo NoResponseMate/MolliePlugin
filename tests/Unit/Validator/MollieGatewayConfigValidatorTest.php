@@ -51,18 +51,6 @@ final class MollieGatewayConfigValidatorTest extends ConstraintValidatorTestCase
         );
     }
 
-    protected function createPersistentCollection(): PersistentCollection
-    {
-        $ref = new \ReflectionClass(PersistentCollection::class);
-        $collection = $ref->newInstanceWithoutConstructor();
-
-        $snapshotProp = $ref->getProperty('snapshot');
-        $snapshotProp->setAccessible(true);
-        $snapshotProp->setValue($collection, [$this->mollieGatewayConfig]);
-
-        return $collection;
-    }
-
     public function testIgnoresNonPersistentCollection(): void
     {
         $this->validator->validate('foo', $this->constraint);
@@ -236,6 +224,19 @@ final class MollieGatewayConfigValidatorTest extends ConstraintValidatorTestCase
     protected function createValidator(): ConstraintValidatorInterface
     {
         return new MollieGatewayConfigValidator();
+    }
+
+    private function createPersistentCollection(): PersistentCollection
+    {
+        $ref = new \ReflectionClass(PersistentCollection::class);
+        $collection = $ref->newInstanceWithoutConstructor();
+
+        $ref
+            ->getProperty('snapshot')
+            ->setValue($collection, [$this->mollieGatewayConfig])
+        ;
+
+        return $collection;
     }
 
     /**
