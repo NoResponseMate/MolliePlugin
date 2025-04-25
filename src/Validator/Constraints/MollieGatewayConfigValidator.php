@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Sylius\MolliePlugin\Validator\Constraints;
 
 use Doctrine\ORM\PersistentCollection;
+use Mollie\Api\Types\PaymentMethod;
 use Sylius\MolliePlugin\Entity\MollieGatewayConfigInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
@@ -124,6 +125,6 @@ final class MollieGatewayConfigValidator extends ConstraintValidator
 
     private function shouldSkipMaximumValidation(?string $paymentMethodName = null): bool
     {
-        return $paymentMethodName === 'creditcard';
+        return $paymentMethodName === PaymentMethod::CREDITCARD;
     }
 }
