@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace Tests\Sylius\MolliePlugin\PHPUnit\Unit\Validator;
+namespace Tests\Sylius\MolliePlugin\Unit\Validator;
 
 use Doctrine\ORM\PersistentCollection;
 use Sylius\MolliePlugin\Entity\MollieGatewayConfigInterface;
