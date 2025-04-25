@@ -33,5 +33,20 @@
             <tag name="kernel.event_listener" event="workflow.sylius_shipment.transition.create_and_ship.completed" priority="-10" />
             <tag name="kernel.event_listener" event="workflow.sylius_shipment.transition.ship.completed" priority="-10" />
         </service>
+
+        <service id="sylius_mollie.listener.workflow.guard_complete_subscription" class="Sylius\MolliePlugin\EventListener\Workflow\CompleteGuardListener">
+            <argument type="service" id="sylius_mollie.subscription.guard.subscription"/>
+            <tag name="kernel.event_listener" event="workflow.mollie_subscription.guard.complete"/>
+        </service>
+
+        <service id="sylius_mollie.listener.workflow.guard_abort_subscription" class="Sylius\MolliePlugin\EventListener\Workflow\AbortGuardListener">
+            <argument type="service" id="sylius_mollie.subscription.guard.subscription"/>
+            <tag name="kernel.event_listener" event="workflow.mollie_subscription.guard.abort"/>
+        </service>
+
+        <service id="sylius_mollie.listener.workflow.after_activate_subscription" class="Sylius\MolliePlugin\EventListener\Workflow\ActivateAfterListener">
+            <argument type="service" id="sylius_mollie.subscription.processor.subscription_schedule"/>
+            <tag name="kernel.event_listener" event="workflow.mollie_subscription.transition.activate.completed"/>
+        </service>
     </services>
 </container>
