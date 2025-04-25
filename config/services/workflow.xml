@@ -21,5 +21,17 @@
             <argument type="service" id="sylius_mollie.processor.payment_surcharge"/>
             <tag name="kernel.event_listener" event="workflow.sylius_order_checkout.transition.select_payment" />
         </service>
+
+        <service id="sylius_mollie.listener.workflow.purify_ready_shipments" class="Sylius\MolliePlugin\EventListener\Workflow\PurifyReadyShipmentsListener">
+            <argument type="service" id="sylius_mollie.partial_ship.purifier.order_shipment" />
+            <tag name="kernel.event_listener" event="workflow.sylius_shipment.transition.create_and_ship" priority="100" />
+            <tag name="kernel.event_listener" event="workflow.sylius_shipment.transition.ship" priority="100" />
+        </service>
+
+        <service id="sylius_mollie.listener.workflow.resolve_shipment_state" class="Sylius\MolliePlugin\EventListener\Workflow\ResolveShipmentStateListener">
+            <argument type="service" id="sylius.state_resolver.order_shipping" />
+            <tag name="kernel.event_listener" event="workflow.sylius_shipment.transition.create_and_ship.completed" priority="-10" />
+            <tag name="kernel.event_listener" event="workflow.sylius_shipment.transition.ship.completed" priority="-10" />
+        </service>
     </services>
 </container>
