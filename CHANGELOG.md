@@ -1,5 +1,19 @@
 # CHANGELOG
 
+### v1.0.1 (2025-04-28)
+
+- [#107](https://github.com/Sylius/MolliePlugin/pull/107) [Maintenance][Admin] Fix product details template ([@NoResponseMate](https://github.com/NoResponseMate))
+- [#113](https://github.com/Sylius/MolliePlugin/pull/113) Minor improvements to 1.0 installtion guide ([@TheMilek](https://github.com/TheMilek))
+- [#115](https://github.com/Sylius/MolliePlugin/pull/115) [CI] Add docker build for other platforms ([@mpysiak](https://github.com/mpysiak))
+- [#116](https://github.com/Sylius/MolliePlugin/pull/116) Update assets section in installtion guide to mention node 18 support. ([@TheMilek](https://github.com/TheMilek))
+- [#128](https://github.com/Sylius/MolliePlugin/pull/128) Fix building assets for 1.11 version of Sylius ([@TheMilek](https://github.com/TheMilek))
+- [#131](https://github.com/Sylius/MolliePlugin/pull/131) Remove state machine configuration step from installation guide ([@TheMilek](https://github.com/TheMilek))
+- [#133](https://github.com/Sylius/MolliePlugin/pull/133) Resolve the issue with null GatewayConfig ([@TheMilek](https://github.com/TheMilek))
+- [#138](https://github.com/Sylius/MolliePlugin/pull/138) Remove getName method from ProductVariant as it changes default behaviour of the app ([@TheMilek](https://github.com/TheMilek))
+- [#136](https://github.com/Sylius/MolliePlugin/pull/136) Unify templates with OS ([@TheMilek](https://github.com/TheMilek))
+- [#144](https://github.com/Sylius/MolliePlugin/pull/144) Fix state machine configuration ([@mpysiak](https://github.com/mpysiak))
+- [#147](https://github.com/Sylius/MolliePlugin/pull/147) Fix title in layout ([@TheMilek](https://github.com/TheMilek))
+
 ### v1.0.0 (2025-04-03)
 
 - [#1](https://github.com/Sylius/MolliePlugin/pull/1) Remove vimeo/psalm dependency ([@TheMilek](https://github.com/TheMilek))
