@@ -11,26 +11,24 @@
 
 declare(strict_types=1);
 
-namespace Sylius\MolliePlugin\EventListener\Workflow;
+namespace Sylius\MolliePlugin\EventListener\Workflow\MollieSubscription;
 
 use Sylius\MolliePlugin\Entity\MollieSubscriptionInterface;
-use Sylius\MolliePlugin\Subscription\Guard\SubscriptionGuardInterface;
-use Symfony\Component\Workflow\Event\GuardEvent;
+use Sylius\MolliePlugin\Subscription\Processor\SubscriptionScheduleProcessorInterface;
+use Symfony\Component\Workflow\Event\TransitionEvent;
 use Webmozart\Assert\Assert;
 
-final class AbortGuardListener
+final class SubscriptionScheduleSuccessListener
 {
-    public function __construct(private readonly SubscriptionGuardInterface $guard)
+    public function __construct(private readonly SubscriptionScheduleProcessorInterface $processor)
     {
     }
 
-    public function __invoke(GuardEvent $event): void
+    public function __invoke(TransitionEvent $event): void
     {
         $subscription = $event->getSubject();
         Assert::isInstanceOf($subscription, MollieSubscriptionInterface::class);
 
-        if (!$this->guard->isEligibleForPaymentsAbort($subscription)) {
-            $event->setBlocked(true);
-        }
+        $this->processor->process($subscription);
     }
 }

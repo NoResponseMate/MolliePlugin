@@ -11,24 +11,26 @@
 
 declare(strict_types=1);
 
-namespace Sylius\MolliePlugin\EventListener\Workflow;
+namespace Sylius\MolliePlugin\EventListener\Workflow\MollieSubscription;
 
 use Sylius\MolliePlugin\Entity\MollieSubscriptionInterface;
-use Sylius\MolliePlugin\Subscription\Processor\SubscriptionScheduleProcessorInterface;
-use Symfony\Component\Workflow\Event\TransitionEvent;
+use Sylius\MolliePlugin\Subscription\Guard\SubscriptionGuardInterface;
+use Symfony\Component\Workflow\Event\GuardEvent;
 use Webmozart\Assert\Assert;
 
-final class SubscriptionScheduleSuccessListener
+final class CompleteSubscriptionGuardListener
 {
-    public function __construct(private readonly SubscriptionScheduleProcessorInterface $processor)
+    public function __construct(private readonly SubscriptionGuardInterface $guard)
     {
     }
 
-    public function __invoke(TransitionEvent $event): void
+    public function __invoke(GuardEvent $event): void
     {
         $subscription = $event->getSubject();
         Assert::isInstanceOf($subscription, MollieSubscriptionInterface::class);
 
-        $this->processor->process($subscription);
+        if (!$this->guard->isCompletable($subscription)) {
+            $event->setBlocked(true);
+        }
     }
 }

@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace Sylius\MolliePlugin\EventListener\Workflow;
+namespace Sylius\MolliePlugin\EventListener\Workflow\SyliusOrderCheckout;
 
 use Sylius\MolliePlugin\Entity\OrderInterface;
 use Sylius\MolliePlugin\Processor\PaymentSurchargeProcessorInterface;

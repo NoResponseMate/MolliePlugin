@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace Sylius\MolliePlugin\EventListener\Workflow;
+namespace Sylius\MolliePlugin\EventListener\Workflow\SyliusShipment;
 
 use Sylius\Component\Core\Model\ShipmentInterface;
 use Sylius\Component\Core\StateResolver\OrderShippingStateResolver;

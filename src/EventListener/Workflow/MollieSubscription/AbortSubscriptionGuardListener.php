@@ -11,14 +11,14 @@
 
 declare(strict_types=1);
 
-namespace Sylius\MolliePlugin\EventListener\Workflow;
+namespace Sylius\MolliePlugin\EventListener\Workflow\MollieSubscription;
 
 use Sylius\MolliePlugin\Entity\MollieSubscriptionInterface;
 use Sylius\MolliePlugin\Subscription\Guard\SubscriptionGuardInterface;
 use Symfony\Component\Workflow\Event\GuardEvent;
 use Webmozart\Assert\Assert;
 
-final class CompleteGuardListener
+final class AbortSubscriptionGuardListener
 {
     public function __construct(private readonly SubscriptionGuardInterface $guard)
     {
@@ -29,7 +29,7 @@ final class CompleteGuardListener
         $subscription = $event->getSubject();
         Assert::isInstanceOf($subscription, MollieSubscriptionInterface::class);
 
-        if (!$this->guard->isCompletable($subscription)) {
+        if (!$this->guard->isEligibleForPaymentsAbort($subscription)) {
             $event->setBlocked(true);
         }
     }
