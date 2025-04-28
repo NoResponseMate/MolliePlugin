@@ -1,5 +1,14 @@
 # CHANGELOG
 
+### v2.0.1 (2025-04-28)
+
+- [#144](https://github.com/Sylius/MolliePlugin/pull/144) Fix state machine configuration ([@mpysiak](https://github.com/mpysiak))
+- [#142](https://github.com/Sylius/MolliePlugin/pull/142) Remove `Credit Cart` Maximum Amount Limit from Payment Method Configuration ([@Rafikooo](https://github.com/Rafikooo))
+- [#143](https://github.com/Sylius/MolliePlugin/pull/143) Refine Test Namespaces ([@Rafikooo](https://github.com/Rafikooo))
+- [#147](https://github.com/Sylius/MolliePlugin/pull/147) Fix title in layout ([@TheMilek](https://github.com/TheMilek))
+- [#146](https://github.com/Sylius/MolliePlugin/pull/146) Unify templates with os ([@TheMilek](https://github.com/TheMilek))
+- [#150](https://github.com/Sylius/MolliePlugin/pull/150) Add upmerge for 3.0 ([@mpysiak](https://github.com/mpysiak))
+
 ### v2.0.0 (2025-04-16)
 
 - [#14](https://github.com/Sylius/MolliePlugin/pull/14) [Maintenance] Update namespaces to Sylius/MolliePlugin ([@hmfilar](https://github.com/hmfilar))
