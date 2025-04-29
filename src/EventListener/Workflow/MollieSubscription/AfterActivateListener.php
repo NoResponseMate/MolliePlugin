@@ -18,7 +18,7 @@ use Sylius\MolliePlugin\Subscription\Processor\SubscriptionScheduleProcessorInte
 use Symfony\Component\Workflow\Event\TransitionEvent;
 use Webmozart\Assert\Assert;
 
-final class ActivateAfterListener
+final class AfterActivateListener
 {
     public function __construct(private readonly SubscriptionScheduleProcessorInterface $processor)
     {

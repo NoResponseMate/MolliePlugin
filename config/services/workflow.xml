@@ -17,49 +17,49 @@
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd"
 >
     <services>
-        <service id="sylius_mollie.listener.workflow.apply_payment_surcharge" class="Sylius\MolliePlugin\EventListener\Workflow\SyliusOrderCheckout\ApplyPaymentSurchargeListener">
+        <service id="sylius_mollie.listener.workflow.sylius_order_checkout.apply_payment_surcharge" class="Sylius\MolliePlugin\EventListener\Workflow\SyliusOrderCheckout\ApplyPaymentSurchargeListener">
             <argument type="service" id="sylius_mollie.processor.payment_surcharge"/>
             <tag name="kernel.event_listener" event="workflow.sylius_order_checkout.transition.select_payment"/>
         </service>
 
-        <service id="sylius_mollie.listener.workflow.purify_ready_shipments" class="Sylius\MolliePlugin\EventListener\Workflow\SyliusShipment\PurifyReadyShipmentsListener">
+        <service id="sylius_mollie.listener.workflow.sylius_shipment.purify_ready_shipments" class="Sylius\MolliePlugin\EventListener\Workflow\SyliusShipment\PurifyReadyShipmentsListener">
             <argument type="service" id="sylius_mollie.partial_ship.purifier.order_shipment" />
             <tag name="kernel.event_listener" event="workflow.sylius_shipment.transition.create_and_ship" priority="100"/>
             <tag name="kernel.event_listener" event="workflow.sylius_shipment.transition.ship" priority="100"/>
         </service>
 
-        <service id="sylius_mollie.listener.workflow.resolve_shipment_state" class="Sylius\MolliePlugin\EventListener\Workflow\SyliusShipment\ResolveShipmentStateListener">
+        <service id="sylius_mollie.listener.workflow.sylius_shipment.resolve_shipment_state" class="Sylius\MolliePlugin\EventListener\Workflow\SyliusShipment\ResolveShipmentStateListener">
             <argument type="service" id="sylius.state_resolver.order_shipping" />
             <tag name="kernel.event_listener" event="workflow.sylius_shipment.transition.create_and_ship.completed"/>
             <tag name="kernel.event_listener" event="workflow.sylius_shipment.transition.ship.completed"/>
         </service>
 
-        <service id="sylius_mollie.listener.workflow.complete_subscription_guard" class="Sylius\MolliePlugin\EventListener\Workflow\MollieSubscription\CompleteSubscriptionGuardListener">
+        <service id="sylius_mollie.listener.workflow.mollie_subscription.complete_subscription_guard" class="Sylius\MolliePlugin\EventListener\Workflow\MollieSubscription\CompleteSubscriptionGuardListener">
             <argument type="service" id="sylius_mollie.subscription.guard.subscription"/>
             <tag name="kernel.event_listener" event="workflow.mollie_subscription.guard.complete"/>
         </service>
 
-        <service id="sylius_mollie.listener.workflow.abort_subscription_guard" class="Sylius\MolliePlugin\EventListener\Workflow\MollieSubscription\AbortSubscriptionGuardListener">
+        <service id="sylius_mollie.listener.workflow.mollie_subscription.abort_subscription_guard" class="Sylius\MolliePlugin\EventListener\Workflow\MollieSubscription\AbortSubscriptionGuardListener">
             <argument type="service" id="sylius_mollie.subscription.guard.subscription"/>
             <tag name="kernel.event_listener" event="workflow.mollie_subscription.guard.abort"/>
         </service>
 
-        <service id="sylius_mollie.listener.workflow.after_activate_subscription" class="Sylius\MolliePlugin\EventListener\Workflow\MollieSubscription\ActivateAfterListener">
+        <service id="sylius_mollie.listener.workflow.mollie_subscription.after_activate" class="Sylius\MolliePlugin\EventListener\Workflow\MollieSubscription\AfterActivateListener">
             <argument type="service" id="sylius_mollie.subscription.processor.subscription_schedule"/>
             <tag name="kernel.event_listener" event="workflow.mollie_subscription.transition.activate.completed"/>
         </service>
 
-        <service id="sylius_mollie.listener.workflow.subscription_payment_success" class="Sylius\MolliePlugin\EventListener\Workflow\SyliusPayment\SubscriptionPaymentSuccessListener">
+        <service id="sylius_mollie.listener.workflow.sylius_payment.subscription_payment_success" class="Sylius\MolliePlugin\EventListener\Workflow\SyliusPayment\SubscriptionPaymentSuccessListener">
             <argument type="service" id="sylius_mollie.subscription.processor.subscription_payment"/>
             <tag name="kernel.event_listener" event="workflow.sylius_payment.transition.complete.completed"/>
         </service>
 
-        <service id="sylius_mollie.listener.workflow.subscription_payment_fail" class="Sylius\MolliePlugin\EventListener\Workflow\SyliusPayment\SubscriptionPaymentFailListener">
+        <service id="sylius_mollie.listener.workflow.sylius_payment.subscription_payment_fail" class="Sylius\MolliePlugin\EventListener\Workflow\SyliusPayment\SubscriptionPaymentFailListener">
             <argument type="service" id="sylius_mollie.subscription.processor.subscription_payment"/>
             <tag name="kernel.event_listener" event="workflow.sylius_payment.transition.fail.completed"/>
         </service>
 
-        <service id="sylius_mollie.listener.workflow.before_success_schedule_process" class="Sylius\MolliePlugin\EventListener\Workflow\MollieSubscription\SubscriptionScheduleSuccessListener">
+        <service id="sylius_mollie.listener.workflow.mollie_subscription.subscription_schedule_success" class="Sylius\MolliePlugin\EventListener\Workflow\MollieSubscription\SubscriptionScheduleSuccessListener">
             <argument type="service" id="sylius_mollie.subscription.processor.subscription_schedule"/>
             <tag name="kernel.event_listener" event="workflow.mollie_subscription_payment_state_graph.transition.success"/>
         </service>
