@@ -19,8 +19,11 @@ use Payum\Core\Payum;
 use Payum\Core\Security\GenericTokenFactoryInterface;
 use Payum\Core\Security\TokenInterface;
 use SM\Factory\FactoryInterface;
+use Sylius\Abstraction\StateMachine\StateMachineInterface;
+use Sylius\Abstraction\StateMachine\WinzouStateMachineAdapter;
 use Sylius\Component\Core\Model\PaymentInterface;
 use Sylius\Component\Core\Model\PaymentMethodInterface;
+use Sylius\Component\Core\OrderCheckoutTransitions;
 use Sylius\Component\Order\Repository\OrderRepositoryInterface;
 use Sylius\MolliePlugin\Entity\OrderInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -39,14 +42,22 @@ final class PayumController
         private readonly Payum $payum,
         private readonly OrderRepositoryInterface $orderRepository,
         private readonly RouterInterface $router,
-        private readonly FactoryInterface $stateMachineFactory,
+        private readonly FactoryInterface|StateMachineInterface $stateMachineFactory,
         private readonly EntityManagerInterface $entityManager,
     ) {
+        if ($this->stateMachineFactory instanceof FactoryInterface) {
+            trigger_deprecation(
+                'sylius/mollie-plugin',
+                '2.1',
+                sprintf(
+                    'Passing an instance of "%s" as the fourth argument is deprecated. It will accept only instances of "%s" in Mollie 3.0.',
+                    FactoryInterface::class,
+                    StateMachineInterface::class,
+                ),
+            );
+        }
     }
 
-    /**
-     * @throws \SM\SMException
-     */
     public function __invoke(Request $request): Response
     {
         $orderId = $request->get('orderId');
@@ -75,7 +86,8 @@ final class PayumController
     {
         if ($resource->getCheckoutState() !== self::CHECKOUT_STATE_COMPLETED_STATUS) {
             $this->entityManager->beginTransaction();
-            $this->stateMachineFactory->get($resource, 'sylius_order_checkout')->apply(self::STATE_MACHINE_COMPLETE_STATE);
+            $stateMachine = $this->getStateMachine();
+            $stateMachine->apply($resource, OrderCheckoutTransitions::GRAPH, self::STATE_MACHINE_COMPLETE_STATE);
             $this->entityManager->commit();
         }
     }
@@ -115,5 +127,14 @@ final class PayumController
     private function getTokenFactory(): GenericTokenFactoryInterface
     {
         return $this->payum->getTokenFactory();
+    }
+
+    private function getStateMachine(): StateMachineInterface
+    {
+        if ($this->stateMachineFactory instanceof FactoryInterface) {
+            return new WinzouStateMachineAdapter($this->stateMachineFactory);
+        }
+
+        return $this->stateMachineFactory;
     }
 }

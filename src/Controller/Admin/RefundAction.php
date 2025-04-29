@@ -18,6 +18,8 @@ use Payum\Core\Payum;
 use Payum\Core\Request\Refund;
 use Payum\Core\Security\TokenInterface;
 use SM\Factory\FactoryInterface;
+use Sylius\Abstraction\StateMachine\StateMachineInterface;
+use Sylius\Abstraction\StateMachine\WinzouStateMachineAdapter;
 use Sylius\Component\Core\Model\PaymentInterface;
 use Sylius\Component\Core\Model\PaymentMethodInterface;
 use Sylius\Component\Core\Repository\PaymentRepositoryInterface;
@@ -42,10 +44,21 @@ final class RefundAction
         private readonly PaymentRepositoryInterface $paymentRepository,
         private readonly Payum $payum,
         private readonly RequestStack $requestStack,
-        private readonly FactoryInterface $stateMachineFactory,
+        private readonly FactoryInterface|StateMachineInterface $stateMachineFactory,
         private readonly EntityManagerInterface $paymentEntityManager,
         private readonly MollieLoggerActionInterface $loggerAction,
     ) {
+        if ($this->stateMachineFactory instanceof FactoryInterface) {
+            trigger_deprecation(
+                'sylius/mollie-plugin',
+                '2.1',
+                sprintf(
+                    'Passing an instance of "%s" as the fourth argument is deprecated. It will accept only instances of "%s" in Mollie 3.0.',
+                    FactoryInterface::class,
+                    StateMachineInterface::class,
+                ),
+            );
+        }
     }
 
     public function __invoke(Request $request): Response
@@ -125,13 +138,13 @@ final class RefundAction
 
     private function applyStateMachineTransition(PaymentInterface $payment): void
     {
-        $stateMachine = $this->stateMachineFactory->get($payment, PaymentTransitions::GRAPH);
+        $stateMachine = $this->getStateMachine();
 
-        if (!$stateMachine->can(PaymentTransitions::TRANSITION_REFUND)) {
+        if (!$stateMachine->can($payment, PaymentTransitions::GRAPH, PaymentTransitions::TRANSITION_REFUND)) {
             throw new BadRequestHttpException();
         }
 
-        $stateMachine->apply(PaymentTransitions::TRANSITION_REFUND);
+        $stateMachine->apply($payment, PaymentTransitions::GRAPH, PaymentTransitions::TRANSITION_REFUND);
 
         $this->paymentEntityManager->flush();
     }
@@ -142,5 +155,14 @@ final class RefundAction
         $url = $request->headers->get('referer');
 
         return new RedirectResponse($url);
+    }
+
+    private function getStateMachine(): StateMachineInterface
+    {
+        if ($this->stateMachineFactory instanceof FactoryInterface) {
+            return new WinzouStateMachineAdapter($this->stateMachineFactory);
+        }
+
+        return $this->stateMachineFactory;
     }
 }
