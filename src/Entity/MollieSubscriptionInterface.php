@@ -34,6 +34,8 @@ interface MollieSubscriptionInterface extends ResourceInterface
 
     public const STATE_COMPLETED = 'completed';
 
+    public const STATE_SUSPENDED = 'suspended';
+
     public const STATE_ABORTED = 'aborted';
 
     public const PROCESSING_STATE_NONE = 'none';
