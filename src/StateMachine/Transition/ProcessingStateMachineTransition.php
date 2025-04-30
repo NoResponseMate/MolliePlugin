@@ -15,6 +15,7 @@ namespace Sylius\MolliePlugin\StateMachine\Transition;
 
 use SM\Factory\FactoryInterface;
 use Sylius\Abstraction\StateMachine\StateMachineInterface;
+use Sylius\Abstraction\StateMachine\WinzouStateMachineAdapter;
 use Sylius\MolliePlugin\Entity\MollieSubscriptionInterface;
 use Sylius\MolliePlugin\StateMachine\MollieSubscriptionProcessingTransitions;
 
@@ -27,7 +28,7 @@ trigger_deprecation(
 );
 final class ProcessingStateMachineTransition implements ProcessingStateMachineTransitionInterface
 {
-    public function __construct(private readonly FactoryInterface $subscriptionStateMachineFactory)
+    public function __construct(private readonly FactoryInterface|StateMachineInterface $subscriptionStateMachineFactory)
     {
     }
 
@@ -35,15 +36,21 @@ final class ProcessingStateMachineTransition implements ProcessingStateMachineTr
         MollieSubscriptionInterface $subscription,
         string $transitions,
     ): void {
-        $stateMachine = $this->subscriptionStateMachineFactory->get(
-            $subscription,
-            MollieSubscriptionProcessingTransitions::GRAPH,
-        );
+        $stateMachine = $this->getStateMachine();
 
-        if (!$stateMachine->can($transitions)) {
+        if (!$stateMachine->can($subscription, MollieSubscriptionProcessingTransitions::GRAPH, $transitions)) {
             return;
         }
 
-        $stateMachine->apply($transitions);
+        $stateMachine->apply($subscription, MollieSubscriptionProcessingTransitions::GRAPH, $transitions);
+    }
+
+    private function getStateMachine(): StateMachineInterface
+    {
+        if ($this->subscriptionStateMachineFactory instanceof FactoryInterface) {
+            return new WinzouStateMachineAdapter($this->subscriptionStateMachineFactory);
+        }
+
+        return $this->subscriptionStateMachineFactory;
     }
 }
