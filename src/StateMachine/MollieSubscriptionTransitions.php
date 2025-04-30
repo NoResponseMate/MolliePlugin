@@ -28,8 +28,4 @@ final class MollieSubscriptionTransitions
     public const TRANSITION_COMPLETE = 'complete';
 
     public const TRANSITION_ABORT = 'abort';
-
-    private function __construct()
-    {
-    }
 }
