@@ -25,10 +25,17 @@
    - `Sylius\MolliePlugin\Controller\Admin\RefundAction`
    - `Sylius\MolliePlugin\Controller\Shop\PayumController`
    - `Sylius\MolliePlugin\StateMachine\Applicator\MollieOrderStatesApplicator`
+   - `Sylius\MolliePlugin\StateMachine\Transition\PaymentStateMachineTransition`
+   - `Sylius\MolliePlugin\StateMachine\Transition\ProcessingStateMachineTransition`
+   - `Sylius\MolliePlugin\StateMachine\Transition\StateMachineTransition`
+   - `Sylius\MolliePlugin\Console\Command\BeginProcessingSubscriptions`
+   - `Sylius\MolliePlugin\Console\Command\ProcessSubscriptions`
 
-    ```diff
-    public function __construct(
-    -   private readonly FactoryInterface $stateMachineFactory,
-    +   private readonly FactoryInterface|StateMachineInterface $stateMachineFactory,
-    ) {
-    ```
+      ```diff
+      public function __construct(
+          ...
+      -   private readonly FactoryInterface $stateMachineFactory,
+      +   private readonly FactoryInterface|StateMachineInterface $stateMachineFactory,
+          ...
+      ) {
+      ```

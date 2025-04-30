@@ -13,7 +13,9 @@ declare(strict_types=1);
 
 namespace Sylius\MolliePlugin\Console\Command;
 
-use SM\Factory\Factory;
+use SM\Factory\FactoryInterface;
+use Sylius\Abstraction\StateMachine\StateMachineInterface;
+use Sylius\Abstraction\StateMachine\WinzouStateMachineAdapter;
 use Sylius\MolliePlugin\Repository\MollieSubscriptionRepositoryInterface;
 use Sylius\MolliePlugin\StateMachine\MollieSubscriptionPaymentProcessingTransitions;
 use Sylius\MolliePlugin\StateMachine\MollieSubscriptionProcessingTransitions;
@@ -36,11 +38,23 @@ class ProcessSubscriptions extends Command
 
     public function __construct(
         private readonly MollieSubscriptionRepositoryInterface $mollieSubscriptionRepository,
-        private readonly Factory $stateMachineFactory,
+        private readonly FactoryInterface|StateMachineInterface $stateMachineFactory,
         private readonly SubscriptionProcessorInterface $subscriptionProcessor,
         private readonly RouterInterface $router,
     ) {
         parent::__construct(self::COMMAND_NAME);
+
+        if ($this->stateMachineFactory instanceof FactoryInterface) {
+            trigger_deprecation(
+                'sylius/mollie-plugin',
+                '2.1',
+                sprintf(
+                    'Passing an instance of "%s" as the second argument is deprecated. It will accept only instances of "%s" in MolliePlugin 3.0.',
+                    FactoryInterface::class,
+                    StateMachineInterface::class,
+                ),
+            );
+        }
     }
 
     protected function configure(): void
@@ -65,20 +79,17 @@ class ProcessSubscriptions extends Command
 
             $subscriptions = $this->mollieSubscriptionRepository->findProcessableSubscriptions();
             $routerContext = $this->router->getContext();
+            $stateMachine = $this->getStateMachine();
             foreach ($subscriptions as $subscription) {
-                $processingGraph = $this->stateMachineFactory->get($subscription, MollieSubscriptionProcessingTransitions::GRAPH);
-
-                if (false === $processingGraph->can(MollieSubscriptionProcessingTransitions::TRANSITION_PROCESS)) {
+                if (!$stateMachine->can($subscription, MollieSubscriptionProcessingTransitions::GRAPH, MollieSubscriptionProcessingTransitions::TRANSITION_PROCESS)) {
                     continue;
                 }
 
-                $paymentGraph = $this->stateMachineFactory->get($subscription, MollieSubscriptionPaymentProcessingTransitions::GRAPH);
-
-                if (false === $paymentGraph->can(MollieSubscriptionPaymentProcessingTransitions::TRANSITION_BEGIN)) {
+                if (!$stateMachine->can($subscription, MollieSubscriptionPaymentProcessingTransitions::GRAPH, MollieSubscriptionPaymentProcessingTransitions::TRANSITION_BEGIN)) {
                     continue;
                 }
 
-                $paymentGraph->apply(MollieSubscriptionPaymentProcessingTransitions::TRANSITION_BEGIN);
+                $stateMachine->apply($subscription, MollieSubscriptionPaymentProcessingTransitions::GRAPH, MollieSubscriptionPaymentProcessingTransitions::TRANSITION_BEGIN);
 
                 $configuration = $subscription->getSubscriptionConfiguration();
                 $routerContext->setHost($configuration->getHostName());
@@ -88,7 +99,7 @@ class ProcessSubscriptions extends Command
                 $routerContext->setParameter('_locale', $firstOrder->getLocaleCode());
                 $this->subscriptionProcessor->processNextPayment($subscription);
 
-                $processingGraph->apply(MollieSubscriptionProcessingTransitions::TRANSITION_PROCESS);
+                $stateMachine->apply($subscription, MollieSubscriptionProcessingTransitions::GRAPH, MollieSubscriptionProcessingTransitions::TRANSITION_PROCESS);
                 $this->mollieSubscriptionRepository->add($subscription);
             }
 
@@ -98,7 +109,7 @@ class ProcessSubscriptions extends Command
                 \sprintf('An error has occurred during send payment link process. (%s)', $exception->getMessage()),
             );
 
-            return 1;
+            return Command::FAILURE;
         }
 
         $event = $stopwatch->stop(self::COMMAND_ID);
@@ -113,6 +124,15 @@ class ProcessSubscriptions extends Command
             );
         }
 
-        return 0;
+        return Command::SUCCESS;
+    }
+
+    private function getStateMachine(): StateMachineInterface
+    {
+        if ($this->stateMachineFactory instanceof FactoryInterface) {
+            return new WinzouStateMachineAdapter($this->stateMachineFactory);
+        }
+
+        return $this->stateMachineFactory;
     }
 }

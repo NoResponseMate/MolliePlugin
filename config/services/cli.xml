@@ -24,13 +24,13 @@
 
         <service id="sylius_mollie.console.command.subscription.begin_processing" class="Sylius\MolliePlugin\Console\Command\BeginProcessingSubscriptions">
             <argument type="service" id="sylius_mollie.repository.mollie_subscription"/>
-            <argument type="service" id="sm.factory"/>
+            <argument type="service" id="sylius_abstraction.state_machine"/>
             <tag name="console.command"/>
         </service>
 
         <service id="sylius_mollie.console.command.subscription.process" class="Sylius\MolliePlugin\Console\Command\ProcessSubscriptions">
             <argument type="service" id="sylius_mollie.repository.mollie_subscription"/>
-            <argument type="service" id="sm.factory"/>
+            <argument type="service" id="sylius_abstraction.state_machine"/>
             <argument type="service" id="sylius_mollie.subscription.processor.subscription"/>
             <argument type="service" id="router"/>
             <tag name="console.command"/>
