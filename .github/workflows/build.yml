@@ -13,33 +13,21 @@ jobs:
     tests:
         runs-on: ubuntu-latest
 
-        name: "Sylius ${{ matrix.sylius }}, PHP ${{ matrix.php }}, Symfony ${{ matrix.symfony }}, State Machine ${{ matrix.state_machine_adapter }}"
+        name: "Sylius ${{ matrix.sylius }}, PHP ${{ matrix.php }}, Symfony ${{ matrix.symfony }}, MySQL ${{ matrix.mysql }}"
 
         strategy:
             fail-fast: false
             matrix:
-                php: [ "8.3" ]
+                php: [ "8.1" ]
                 node: [ "18.x" ]
                 mysql: [ "8.4" ]
                 symfony: [ "^6.4" ]
                 sylius: [ "~1.13.11", "~1.14.4" ]
                 admin_order_creation: [ "no", "yes" ]
-                state_machine_adapter: [ "winzou_state_machine" ]
-
-                include:
-                    -
-                        php: "8.3"
-                        node: "18.x"
-                        mysql: "8.4"
-                        symfony: "^6.4"
-                        sylius: "~1.14.4"
-                        admin_order_creation: "no"
-                        state_machine_adapter: "symfony_workflow"
 
         env:
             APP_ENV: test
             DATABASE_URL: "mysql://root:root@127.0.0.1/sylius?serverVersion=${{ matrix.mysql }}"
-            TEST_SYLIUS_STATE_MACHINE_ADAPTER: "${{ matrix.state_machine_adapter }}"
 
         steps:
             -   uses: actions/checkout@v4
