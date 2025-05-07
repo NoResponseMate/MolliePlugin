@@ -4,6 +4,7 @@
    - `templates/bundles/SyliusAdminBundle/Layout/layout.html.twig`
    - `templates/bundles/SyliusAdminBundle/Order/Show/_payment.html.twig`
    - `templates/bundles/SyliusAdminBundle/Product/Tab/_details.html.twig`
+   - `templates/bundles/SyliusAdminBundle/Shipment/Partial/_ship.html.twig`
    - `templates/bundles/SyliusRefundPlugin/orderRefunds.html.twig`
    - `templates/bundles/SyliusShopBundle/Checkout/_support.html.twig`
    - `templates/bundles/SyliusShopBundle/Product/_info.html.twig`
