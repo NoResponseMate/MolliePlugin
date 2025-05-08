@@ -14,15 +14,15 @@ services:
             - "@sylius.repository.gateway_config"
             - "@sylius_mollie.repository.mollie_gateway_config"
 
-#    sylius_mollie.behat.context.setup.order:
-#        class: Tests\Sylius\MolliePlugin\Behat\Context\Setup\OrderContext
-#        public: true
-#        arguments:
-#            - "@doctrine.orm.default_entity_manager"
-#            - "@sm.factory"
-#            - "@payum"
-#            - "@sylius_mollie.payum.checker.mollie_gateway_factory"
-#            - '@sylius_mollie.provider.divisor'
+    sylius_mollie.behat.context.setup.order:
+        class: Tests\Sylius\MolliePlugin\Behat\Context\Setup\OrderContext
+        public: true
+        arguments:
+            - "@doctrine.orm.default_entity_manager"
+            - "@sylius_abstraction.state_machine"
+            - "@payum"
+            - "@sylius_mollie.payum.checker.mollie_gateway_factory"
+            - '@sylius_mollie.provider.divisor'
 
     sylius_mollie.behat.context.setup.subscription:
         class: Tests\Sylius\MolliePlugin\Behat\Context\Setup\SubscriptionContext

@@ -35,6 +35,7 @@ parameters:
         - '#.* has invalid type SM\\Factory\\Factory.#'
         - '#.* has unknown class SM\\Factory\\FactoryInterface .*#'
         - '#.* has unknown class SM\\Factory\\Factory .*#'
+        - '#Class SM\\Factory\\FactoryInterface not found.#'
         - '#Call to method get\(\) on an unknown class SM\\Factory\\FactoryInterface.#'
         - '#Call to method get\(\) on an unknown class SM\\Factory\\Factory.#'
         - '#Call to an undefined method Sylius\\Component\\Resource\\StateMachine\\StateMachineInterface::apply\(\).#'
