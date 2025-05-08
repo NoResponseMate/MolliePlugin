@@ -53,7 +53,6 @@
         ]
     },
     "prefer-stable": true,
-    "prefer-dist": true,
     "autoload": {
         "psr-4": {
             "Sylius\\MolliePlugin\\": "src/",
@@ -61,6 +60,9 @@
         }
     },
     "config": {
+        "preferred-install": {
+            "*": "dist"
+        },
         "allow-plugins": {
             "dealerdirect/phpcodesniffer-composer-installer": true,
             "php-http/discovery": true,
@@ -73,7 +75,7 @@
     },
     "extra": {
         "symfony": {
-            "require": "^7.1",
+            "require": "^7.2",
             "allow-contrib": false,
             "docker": false
         },

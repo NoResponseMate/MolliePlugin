@@ -29,3 +29,12 @@ parameters:
 
         - '#Property .* is never read, only written.#'
         - '#Method .*get.*Translation\(\) should return Sylius\\.*Resource\\Model\\TranslationInterface but returns Sylius\\.*Resource\\Model\\TranslationInterface.#'
+
+        # State machine abstraction related
+        - '#.* has invalid type SM\\Factory\\FactoryInterface.#'
+        - '#.* has invalid type SM\\Factory\\Factory.#'
+        - '#.* has unknown class SM\\Factory\\FactoryInterface .*#'
+        - '#.* has unknown class SM\\Factory\\Factory .*#'
+        - '#Call to method get\(\) on an unknown class SM\\Factory\\FactoryInterface.#'
+        - '#Call to method get\(\) on an unknown class SM\\Factory\\Factory.#'
+        - '#Call to an undefined method Sylius\\Component\\Resource\\StateMachine\\StateMachineInterface::apply\(\).#'

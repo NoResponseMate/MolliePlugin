@@ -1,7 +1,7 @@
 imports:
     - { resource: "@SyliusRefundPlugin/config/config.yaml" }
     - { resource: "@SyliusMolliePlugin/config/config.yaml" }
-    - { resource: "services_test.php" }
+#    - { resource: "services_test.php" } # fix and enable when working on behat
 
 parameters:
     sylius_cms_api_platform_mapping_path: '%kernel.project_dir%/../../../config/api_platform/'

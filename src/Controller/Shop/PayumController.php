@@ -44,9 +44,6 @@ final class PayumController
     ) {
     }
 
-    /**
-     * @throws \SM\SMException
-     */
     public function __invoke(Request $request): Response
     {
         $orderId = $request->get('orderId');

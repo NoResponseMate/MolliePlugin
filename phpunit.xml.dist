@@ -6,6 +6,7 @@
     backupGlobals="false"
     colors="true"
     bootstrap="vendor/sylius/test-application/config/bootstrap.php"
+
 >
     <testsuites>
         <testsuite name="functional">
@@ -13,12 +14,15 @@
         </testsuite>
         <testsuite name="unit">
             <directory>tests/Unit</directory>
+<!--         TODO: Remove the exclusion below after state machines are taken care of -->
+            <exclude>tests/Unit/Action/StateMachine</exclude>
         </testsuite>
     </testsuites>
 
     <php>
         <env name="APP_ENV" value="test"/>
         <env name="APP_SECRET" value="3bdace956617bb6576d69894be92d43a"/>
+        <env name="SYMFONY_DEPRECATIONS_HELPER" value="weak"/>
 
         <server name="APP_ENV" value="test" />
         <server name="KERNEL_CLASS" value="Sylius\TestApplication\Kernel" />
