@@ -312,16 +312,12 @@ bin/console doctrine:migrations:migrate
 ```
 mkdir -p templates/bundles/SyliusAdminBundle/
 mkdir -p templates/bundles/SyliusShopBundle/
-mkdir -p templates/bundles/SyliusUiBundle/
-mkdir -p templates/bundles/SyliusRefundPlugin/
 ```
 **Note:** Be aware that the following commands will override your existing templates!
 
 ```
 cp -R vendor/sylius/mollie-plugin/templates/bundles/SyliusAdminBundle/* templates/bundles/SyliusAdminBundle/
 cp -R vendor/sylius/mollie-plugin/templates/bundles/SyliusShopBundle/* templates/bundles/SyliusShopBundle/
-cp -R vendor/sylius/mollie-plugin/templates/bundles/SyliusUiBundle/* templates/bundles/SyliusUiBundle/
-cp -R vendor/sylius/mollie-plugin/templates/bundles/SyliusRefundPlugin/* templates/bundles/SyliusRefundPlugin/
 ```
 
 **Important:**
