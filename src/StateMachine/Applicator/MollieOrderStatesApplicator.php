@@ -35,9 +35,9 @@ final class MollieOrderStatesApplicator implements MollieOrderStatesApplicatorIn
         if ($this->factory instanceof FactoryInterface) {
             trigger_deprecation(
                 'sylius/mollie-plugin',
-                '2.1',
+                '2.2',
                 sprintf(
-                    'Passing an instance of "%s" as the first argument is deprecated. It will accept only instances of "%s" in Mollie 3.0.',
+                    'Passing an instance of "%s" as the first argument is deprecated. It will accept only instances of "%s" in MolliePlugin 3.0. The argument name will change from "stateMachineFactory" to "stateMachine".',
                     FactoryInterface::class,
                     StateMachineInterface::class,
                 ),

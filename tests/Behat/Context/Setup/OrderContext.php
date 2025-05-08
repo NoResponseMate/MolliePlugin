@@ -39,9 +39,9 @@ final class OrderContext implements Context
         if ($this->stateMachineFactory instanceof FactoryInterface) {
             trigger_deprecation(
                 'sylius/mollie-plugin',
-                '2.1',
+                '2.2',
                 sprintf(
-                    'Passing an instance of "%s" as the second argument is deprecated. It will accept only instances of "%s" in Mollie 3.0.',
+                    'Passing an instance of "%s" as the second argument is deprecated. It will accept only instances of "%s" in MolliePlugin 3.0.',
                     FactoryInterface::class,
                     StateMachineInterface::class,
                 ),

@@ -43,7 +43,7 @@ final class ProcessingStateMachineTransitionTest extends TestCase
         $subscriptionMock = $this->createMock(MollieSubscriptionInterface::class);
         $stateMachineMock = $this->createMock(StateMachineInterface::class);
 
-        $this->subscriptionSateMachineFactoryMock->expects($this->once())->method('get')->with($subscriptionMock, MollieSubscriptionProcessingTransitions::GRAPH)->willReturn($stateMachineMock);
+        $this->subscriptionSateMachineFactoryMock->expects($this->exactly(2))->method('get')->with($subscriptionMock, MollieSubscriptionProcessingTransitions::GRAPH)->willReturn($stateMachineMock);
         $stateMachineMock->expects($this->once())->method('can')->with(MollieSubscriptionProcessingTransitions::TRANSITION_PROCESS)->willReturn(true);
         $stateMachineMock->expects($this->once())->method('apply')->with(MollieSubscriptionProcessingTransitions::TRANSITION_PROCESS)->willReturn(true);
         $this->processingStateMachineTransition->apply($subscriptionMock, MollieSubscriptionProcessingTransitions::TRANSITION_PROCESS);

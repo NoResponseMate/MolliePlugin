@@ -21,7 +21,7 @@ use Sylius\MolliePlugin\StateMachine\MollieSubscriptionTransitions;
 
 trigger_deprecation(
     'sylius/mollie-plugin',
-    '2.1',
+    '2.2',
     'The "%s" class is deprecated and will be removed in MolliePlugin 3.0. Use "%s" instead.',
     StateMachineTransition::class,
     StateMachineInterface::class,
