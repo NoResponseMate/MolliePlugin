@@ -15,6 +15,8 @@ namespace Sylius\MolliePlugin\StateMachine\Applicator;
 
 use Mollie\Api\Resources\Order;
 use SM\Factory\FactoryInterface;
+use Sylius\Abstraction\StateMachine\StateMachineInterface;
+use Sylius\Abstraction\StateMachine\WinzouStateMachineAdapter;
 use Sylius\Component\Core\Model\OrderInterface;
 use Sylius\Component\Core\Model\ShipmentInterface;
 use Sylius\Component\Core\Repository\OrderRepositoryInterface;
@@ -26,10 +28,21 @@ use Sylius\MolliePlugin\StateMachine\ShipmentTransitions as ShipmentTransitionsP
 final class MollieOrderStatesApplicator implements MollieOrderStatesApplicatorInterface
 {
     public function __construct(
-        private readonly FactoryInterface $factory,
+        private readonly FactoryInterface|StateMachineInterface $factory,
         private readonly OrderRepositoryInterface $orderRepository,
         private readonly CreatePartialShipFromMollieInterface $createPartialShipFromMollie,
     ) {
+        if ($this->factory instanceof FactoryInterface) {
+            trigger_deprecation(
+                'sylius/mollie-plugin',
+                '2.2',
+                sprintf(
+                    'Passing an instance of "%s" as the first argument is deprecated. It will accept only instances of "%s" in MolliePlugin 3.0. The argument name will change from "stateMachineFactory" to "stateMachine".',
+                    FactoryInterface::class,
+                    StateMachineInterface::class,
+                ),
+            );
+        }
     }
 
     public function execute(Order $order): void
@@ -78,22 +91,22 @@ final class MollieOrderStatesApplicator implements MollieOrderStatesApplicatorIn
 
     private function applyOrderTransition(OrderInterface $orderSylius, string $transition): void
     {
-        $stateMachine = $this->factory->get($orderSylius, OrderTransitions::GRAPH);
-        if (!$stateMachine->can($transition)) {
+        $stateMachine = $this->getStateMachine();
+        if (!$stateMachine->can($orderSylius, OrderTransitions::GRAPH, $transition)) {
             return;
         }
 
-        $stateMachine->apply($transition);
+        $stateMachine->apply($orderSylius, OrderTransitions::GRAPH, $transition);
     }
 
     private function applyShipmentTransition(ShipmentInterface $orderSylius, string $transition): void
     {
-        $stateMachine = $this->factory->get($orderSylius, ShipmentTransitions::GRAPH);
-        if (!$stateMachine->can($transition)) {
+        $stateMachine = $this->getStateMachine();
+        if (!$stateMachine->can($orderSylius, ShipmentTransitions::GRAPH, $transition)) {
             return;
         }
 
-        $stateMachine->apply($transition);
+        $stateMachine->apply($orderSylius, ShipmentTransitions::GRAPH, $transition);
     }
 
     private function isShippingAllItems(ShipmentInterface $shipment): bool
@@ -118,5 +131,14 @@ final class MollieOrderStatesApplicator implements MollieOrderStatesApplicatorIn
         }
 
         return $shippableQuantity === count($shipment->getUnits()->toArray());
+    }
+
+    private function getStateMachine(): StateMachineInterface
+    {
+        if ($this->factory instanceof FactoryInterface) {
+            return new WinzouStateMachineAdapter($this->factory);
+        }
+
+        return $this->factory;
     }
 }

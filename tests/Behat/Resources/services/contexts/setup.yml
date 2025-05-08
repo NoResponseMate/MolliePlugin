@@ -19,7 +19,7 @@ services:
         public: true
         arguments:
             - "@doctrine.orm.default_entity_manager"
-            - "@sm.factory"
+            - "@sylius_abstraction.state_machine"
             - "@payum"
             - "@sylius_mollie.payum.checker.mollie_gateway_factory"
             - '@sylius_mollie.provider.divisor'

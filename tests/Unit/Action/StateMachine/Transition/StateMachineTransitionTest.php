@@ -43,7 +43,7 @@ final class StateMachineTransitionTest extends TestCase
         $subscriptionMock = $this->createMock(MollieSubscriptionInterface::class);
         $stateMachineMock = $this->createMock(StateMachineInterface::class);
 
-        $this->subscriptionSateMachineFactoryMock->expects($this->once())->method('get')->with($subscriptionMock, MollieSubscriptionTransitions::GRAPH)->willReturn($stateMachineMock);
+        $this->subscriptionSateMachineFactoryMock->expects($this->exactly(2))->method('get')->with($subscriptionMock, MollieSubscriptionTransitions::GRAPH)->willReturn($stateMachineMock);
         $stateMachineMock->expects($this->once())->method('can')->with(MollieSubscriptionTransitions::TRANSITION_COMPLETE)->willReturn(true);
         $stateMachineMock->expects($this->once())->method('apply')->with(MollieSubscriptionTransitions::TRANSITION_COMPLETE)->willReturn(true);
         $this->stateMachineTransition->apply($subscriptionMock, MollieSubscriptionTransitions::TRANSITION_COMPLETE);
