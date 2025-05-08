@@ -19,7 +19,7 @@ use Sylius\MolliePlugin\StateMachine\MollieSubscriptionPaymentProcessingTransiti
 
 final class PaymentStateMachineTransition implements PaymentStateMachineTransitionInterface
 {
-    public function __construct(private readonly FactoryInterface $subscriptionStateMachineFactory)
+    public function __construct(private readonly ?FactoryInterface $subscriptionStateMachineFactory)
     {
     }
 

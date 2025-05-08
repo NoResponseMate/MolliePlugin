@@ -26,7 +26,7 @@ use Sylius\MolliePlugin\StateMachine\ShipmentTransitions as ShipmentTransitionsP
 final class MollieOrderStatesApplicator implements MollieOrderStatesApplicatorInterface
 {
     public function __construct(
-        private readonly FactoryInterface $factory,
+        private readonly ?FactoryInterface $factory,
         private readonly OrderRepositoryInterface $orderRepository,
         private readonly CreatePartialShipFromMollieInterface $createPartialShipFromMollie,
     ) {

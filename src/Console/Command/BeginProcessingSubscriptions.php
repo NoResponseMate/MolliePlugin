@@ -33,7 +33,7 @@ class BeginProcessingSubscriptions extends Command
 
     public function __construct(
         private readonly MollieSubscriptionRepositoryInterface $mollieSubscriptionRepository,
-        private readonly Factory $stateMachineFactory,
+        private readonly ?Factory $stateMachineFactory,
     ) {
         parent::__construct(self::COMMAND_NAME);
     }
