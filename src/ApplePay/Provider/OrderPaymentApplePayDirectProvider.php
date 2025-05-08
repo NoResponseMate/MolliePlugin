@@ -18,6 +18,7 @@ use SM\Factory\FactoryInterface;
 use Sylius\Abstraction\StateMachine\StateMachineInterface;
 use Sylius\Abstraction\StateMachine\WinzouStateMachineAdapter;
 use Sylius\AdminOrderCreationPlugin\Provider\PaymentTokenProviderInterface as OrderCreationPaymentTokenProviderInterface;
+use SM\Factory\FactoryInterface as StateMachineFactoryInterface;
 use Sylius\Component\Core\Model\PaymentInterface;
 use Sylius\Component\Core\Model\PaymentMethodInterface;
 use Sylius\Component\Core\Payment\Exception\NotProvidedOrderPaymentException;
@@ -38,7 +39,7 @@ final class OrderPaymentApplePayDirectProvider implements OrderPaymentApplePayDi
         private readonly FactoryInterface|StateMachineInterface $stateMachineFactory,
         private readonly RepositoryInterface $paymentMethodRepository,
         private readonly RepositoryInterface $gatewayConfigRepository,
-        private readonly OrderCreationPaymentTokenProviderInterface|PaymentTokenProviderInterface $paymentTokenProvider,
+        private readonly PaymentTokenProviderInterface $paymentTokenProvider,
         private readonly Payum $payum,
     ) {
         if ($this->stateMachineFactory instanceof FactoryInterface) {
