@@ -15,7 +15,6 @@ namespace Sylius\MolliePlugin\ApplePay\Provider;
 
 use Payum\Core\Payum;
 use SM\Factory\FactoryInterface as StateMachineFactoryInterface;
-use Sylius\AdminOrderCreationPlugin\Provider\PaymentTokenProviderInterface as OrderCreationPaymentTokenProviderInterface;
 use Sylius\Component\Core\Model\PaymentInterface;
 use Sylius\Component\Core\Model\PaymentMethodInterface;
 use Sylius\Component\Core\Payment\Exception\NotProvidedOrderPaymentException;
@@ -34,10 +33,10 @@ final class OrderPaymentApplePayDirectProvider implements OrderPaymentApplePayDi
 {
     public function __construct(
         private readonly PaymentFactoryInterface $paymentFactory,
-        private readonly StateMachineFactoryInterface $stateMachineFactory,
+        private readonly ?StateMachineFactoryInterface $stateMachineFactory,
         private readonly RepositoryInterface $paymentMethodRepository,
         private readonly RepositoryInterface $gatewayConfigRepository,
-        private readonly OrderCreationPaymentTokenProviderInterface|PaymentTokenProviderInterface $paymentTokenProvider,
+        private readonly PaymentTokenProviderInterface $paymentTokenProvider,
         private readonly Payum $payum,
     ) {
     }

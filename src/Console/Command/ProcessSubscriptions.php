@@ -36,7 +36,7 @@ class ProcessSubscriptions extends Command
 
     public function __construct(
         private readonly MollieSubscriptionRepositoryInterface $mollieSubscriptionRepository,
-        private readonly Factory $stateMachineFactory,
+        private readonly ?Factory $stateMachineFactory,
         private readonly SubscriptionProcessorInterface $subscriptionProcessor,
         private readonly RouterInterface $router,
     ) {

@@ -19,7 +19,7 @@ use Sylius\MolliePlugin\StateMachine\MollieSubscriptionTransitions;
 
 final class StateMachineTransition implements StateMachineTransitionInterface
 {
-    public function __construct(private readonly FactoryInterface $subscriptionStateMachineFactory)
+    public function __construct(private readonly ?FactoryInterface $subscriptionStateMachineFactory)
     {
     }
 

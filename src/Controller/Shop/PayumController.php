@@ -39,7 +39,7 @@ final class PayumController
         private readonly Payum $payum,
         private readonly OrderRepositoryInterface $orderRepository,
         private readonly RouterInterface $router,
-        private readonly FactoryInterface $stateMachineFactory,
+        private readonly ?FactoryInterface $stateMachineFactory,
         private readonly EntityManagerInterface $entityManager,
     ) {
     }
