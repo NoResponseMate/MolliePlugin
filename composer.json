@@ -57,7 +57,7 @@
     "autoload": {
         "psr-4": {
             "Sylius\\MolliePlugin\\": "src/",
-            "Tests\\Sylius\\MolliePlugin\\": ["tests/", "tests/Application/src"]
+            "Tests\\Sylius\\MolliePlugin\\": ["tests/", "tests/TestApplication/src/"]
         }
     },
     "config": {
