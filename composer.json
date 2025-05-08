@@ -33,6 +33,7 @@
         "phpunit/phpunit": "^9.5",
         "polishsymfonycommunity/symfony-mocker-container": "^1.0",
         "sylius-labs/coding-standard": "^4.0",
+        "sylius/test-application": "^2.0.0@alpha",
         "symfony/browser-kit": "^6.4 || ^7.1",
         "symfony/debug-bundle": "^6.4 || ^7.1",
         "symfony/dotenv": "^6.4 || ^7.1",
@@ -59,16 +60,14 @@
             "Tests\\Sylius\\MolliePlugin\\": ["tests/", "tests/Application/src"]
         }
     },
-    "autoload-dev": {
-        "classmap": ["tests/Application/Kernel.php"]
-    },
     "config": {
         "allow-plugins": {
             "dealerdirect/phpcodesniffer-composer-installer": true,
+            "php-http/discovery": true,
             "phpstan/extension-installer": true,
             "symfony/flex": true,
-            "symfony/thanks": false,
-            "php-http/discovery": true
+            "symfony/runtime": false,
+            "symfony/thanks": false
         },
         "sort-packages": true
     },
@@ -77,6 +76,7 @@
             "require": "^7.1",
             "allow-contrib": false,
             "docker": false
-        }
+        },
+        "public-dir": "vendor/sylius/test-application/public"
     }
 }
