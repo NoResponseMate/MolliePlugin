@@ -42,7 +42,7 @@ final class RefundAction
         private readonly PaymentRepositoryInterface $paymentRepository,
         private readonly Payum $payum,
         private readonly RequestStack $requestStack,
-        private readonly FactoryInterface $stateMachineFactory,
+        private readonly ?FactoryInterface $stateMachineFactory,
         private readonly EntityManagerInterface $paymentEntityManager,
         private readonly MollieLoggerActionInterface $loggerAction,
     ) {
