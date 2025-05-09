@@ -5,6 +5,7 @@ imports:
     - { resource: "email/**/*.yaml" }
 #    - { resource: "ui/**/*.yaml" }
     - { resource: "fixtures/**/*.yaml" }
+    - { resource: "twig_hooks/**/*.yaml" }
 
 twig:
     globals:
