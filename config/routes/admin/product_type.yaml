@@ -6,8 +6,7 @@ app_admin_product_type:
         except: ['show']
         grid: sylius_mollie_plugin_admin_product_type
         vars:
-            all:
-                subheader: sylius_mollie.ui.manage_product_types
+            hook_prefix: 'sylius_mollie.admin.mollie.product_type'
         redirect: index
         permission: true
     type: sylius.resource
