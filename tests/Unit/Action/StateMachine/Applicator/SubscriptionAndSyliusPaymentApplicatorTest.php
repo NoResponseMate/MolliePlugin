@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Tests\Sylius\MolliePlugin\Unit\Action\StateMachine\Applicator;
 
 use PHPUnit\Framework\TestCase;
+use Sylius\Abstraction\StateMachine\StateMachineInterface;
 use Sylius\Component\Core\Model\PaymentInterface;
 use Sylius\MolliePlugin\Entity\MollieSubscriptionInterface;
 use Sylius\MolliePlugin\StateMachine\Applicator\SubscriptionAndSyliusPaymentApplicator;
@@ -113,6 +114,34 @@ final class SubscriptionAndSyliusPaymentApplicatorTest extends TestCase
         $paymentMock->expects($this->once())->method('getState')->willReturn('definitely not state');
         $subscriptionMock->expects($this->once())->method('incrementFailedPaymentCounter');
         $this->paymentStateMachineTransitionMock->expects($this->once())->method('apply')->with($subscriptionMock, MollieSubscriptionPaymentProcessingTransitions::TRANSITION_FAILURE);
+        $this->subscriptionAndSyliusPaymentApplicator->execute($subscriptionMock, $paymentMock);
+    }
+
+    public function testAppliesTransitionWhenStatusIsProcessingWithAbstractStateMachine(): void
+    {
+        $stateMachine = $this->createMock(StateMachineInterface::class);
+        $this->subscriptionAndSyliusPaymentApplicator = new SubscriptionAndSyliusPaymentApplicator($stateMachine);
+
+        $subscriptionMock = $this->createMock(MollieSubscriptionInterface::class);
+        $paymentMock = $this->createMock(PaymentInterface::class);
+
+        $paymentMock->expects($this->once())->method('getState')->willReturn(PaymentInterface::STATE_PROCESSING);
+
+        $stateMachine->method('can')
+            ->willReturnMap([
+                [$subscriptionMock, MollieSubscriptionPaymentProcessingTransitions::GRAPH, MollieSubscriptionPaymentProcessingTransitions::TRANSITION_BEGIN, true],
+                [$subscriptionMock, MollieSubscriptionTransitions::GRAPH, MollieSubscriptionTransitions::TRANSITION_PROCESS, true],
+            ])
+        ;
+
+        $stateMachine->expects($this->exactly(2))
+            ->method('apply')
+            ->withConsecutive(
+                [$subscriptionMock, MollieSubscriptionPaymentProcessingTransitions::GRAPH, MollieSubscriptionPaymentProcessingTransitions::TRANSITION_BEGIN],
+                [$subscriptionMock, MollieSubscriptionTransitions::GRAPH, MollieSubscriptionTransitions::TRANSITION_PROCESS],
+            )
+        ;
+
         $this->subscriptionAndSyliusPaymentApplicator->execute($subscriptionMock, $paymentMock);
     }
 }

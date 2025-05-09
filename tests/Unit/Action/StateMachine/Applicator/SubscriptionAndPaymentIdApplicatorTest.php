@@ -17,6 +17,7 @@ use Mollie\Api\Endpoints\PaymentEndpoint;
 use Mollie\Api\Resources\Payment;
 use Mollie\Api\Types\PaymentStatus;
 use PHPUnit\Framework\TestCase;
+use Sylius\Abstraction\StateMachine\StateMachineInterface;
 use Sylius\MolliePlugin\Client\MollieApiClient;
 use Sylius\MolliePlugin\Entity\MollieSubscriptionConfigurationInterface;
 use Sylius\MolliePlugin\Entity\MollieSubscriptionInterface;
@@ -164,6 +165,46 @@ final class SubscriptionAndPaymentIdApplicatorTest extends TestCase
         $paymentMock->status = 'definitely not payment status';
         $subscriptionMock->expects($this->once())->method('incrementFailedPaymentCounter');
         $this->paymentStateMachineTransitionMock->expects($this->once())->method('apply')->with($subscriptionMock, MollieSubscriptionPaymentProcessingTransitions::TRANSITION_FAILURE);
+        $this->subscriptionAndPaymentIdApplicator->execute($subscriptionMock, 'id_1');
+    }
+
+    public function testAppliesTransitionWhenStatusIsOpenWithAbstractStateMachine(): void
+    {
+        $stateMachine = $this->createMock(StateMachineInterface::class);
+        $this->subscriptionAndPaymentIdApplicator = new SubscriptionAndPaymentIdApplicator($this->mollieApiClientMock, $stateMachine);
+
+
+        $subscriptionMock = $this->createMock(MollieSubscriptionInterface::class);
+        $configurationMock = $this->createMock(MollieSubscriptionConfigurationInterface::class);
+        $paymentEndpointMock = $this->createMock(PaymentEndpoint::class);
+        $paymentMock = $this->createMock(Payment::class);
+
+        $subscriptionMock->expects($this->once())->method('getSubscriptionConfiguration')->willReturn($configurationMock);
+        $this->mollieApiClientMock->payments = $paymentEndpointMock;
+        $paymentEndpointMock->expects($this->once())->method('get')->with('id_1')->willReturn($paymentMock);
+        $configurationMock->expects($this->once())->method('getMandateId')->willReturn(null);
+        $configurationMock->expects($this->once())->method('getCustomerId')->willReturn(null);
+        $paymentMock->mandateId = 'mandate_id';
+        $paymentMock->customerId = 'customer_id';
+        $configurationMock->expects($this->once())->method('setMandateId')->with('mandate_id');
+        $configurationMock->expects($this->once())->method('setCustomerId')->with('customer_id');
+        $paymentMock->status = PaymentStatus::STATUS_OPEN;
+
+        $stateMachine->method('can')
+            ->willReturnMap([
+                [$subscriptionMock, MollieSubscriptionPaymentProcessingTransitions::GRAPH, MollieSubscriptionPaymentProcessingTransitions::TRANSITION_BEGIN, true],
+                [$subscriptionMock, MollieSubscriptionTransitions::GRAPH, MollieSubscriptionTransitions::TRANSITION_PROCESS, true],
+            ])
+        ;
+
+        $stateMachine->expects($this->exactly(2))
+            ->method('apply')
+            ->withConsecutive(
+                [$subscriptionMock, MollieSubscriptionPaymentProcessingTransitions::GRAPH, MollieSubscriptionPaymentProcessingTransitions::TRANSITION_BEGIN],
+                [$subscriptionMock, MollieSubscriptionTransitions::GRAPH, MollieSubscriptionTransitions::TRANSITION_PROCESS],
+            )
+        ;
+
         $this->subscriptionAndPaymentIdApplicator->execute($subscriptionMock, 'id_1');
     }
 }

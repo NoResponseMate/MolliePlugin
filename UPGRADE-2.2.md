@@ -3,8 +3,11 @@
 1. The following classes have been marked as deprecated:
 
    - `Sylius\MolliePlugin\StateMachine\Transition\PaymentStateMachineTransition`
+   - `Sylius\MolliePlugin\StateMachine\Transition\PaymentStateMachineTransitionInterface`
    - `Sylius\MolliePlugin\StateMachine\Transition\ProcessingStateMachineTransition`
+   - `Sylius\MolliePlugin\StateMachine\Transition\ProcessingStateMachineTransitionInterface`
    - `Sylius\MolliePlugin\StateMachine\Transition\StateMachineTransition`
+   - `Sylius\MolliePlugin\StateMachine\Transition\StateMachineTransitionInterface`
 
 1. Winzou State Machine deprecations
 
@@ -28,3 +31,41 @@
           ...
       ) {
       ```
+
+1. The following constructor signatures have been changed:
+
+   `Sylius\MolliePlugin\Payum\Action\Subscription\StatusRecurringSubscriptionAction`:
+   ```diff
+   public function __construct(
+       private EntityManagerInterface $subscriptionManager,
+       private SubscriptionAndPaymentIdApplicatorInterface $subscriptionAndPaymentIdApplicator,
+       private SubscriptionAndSyliusPaymentApplicatorInterface $subscriptionAndSyliusPaymentApplicator,
+   -   private StateMachineTransitionInterface $stateMachineTransition,
+   +   private StateMachineTransitionInterface|StateMachineInterface $stateMachineTransition,
+       )
+   ```
+
+   `Sylius\MolliePlugin\StateMachine\Applicator\SubscriptionAndPaymentIdApplicator`:
+   ```diff
+   public function __construct(
+        private MollieApiClient $mollieApiClient,
+   -    private StateMachineTransitionInterface $stateMachineTransition,
+   +    private StateMachineTransitionInterface|StateMachineInterface $stateMachineTransition,
+   -    private PaymentStateMachineTransitionInterface $paymentStateMachineTransition,
+   +    private ?PaymentStateMachineTransitionInterface $paymentStateMachineTransition = null,
+   -    private ProcessingStateMachineTransitionInterface $processingStateMachineTransition,
+   +    private ?ProcessingStateMachineTransitionInterface $processingStateMachineTransition = null,
+   )
+   ```
+
+   `Sylius\MolliePlugin\StateMachine\Applicator\SubscriptionAndSyliusPaymentApplicator`:
+   ```diff
+   public function __construct(
+   -    private StateMachineTransitionInterface $stateMachineTransition,
+   +    private StateMachineTransitionInterface|StateMachineInterface $stateMachineTransition,
+   -    private PaymentStateMachineTransitionInterface $paymentStateMachineTransition,
+   +    private ?PaymentStateMachineTransitionInterface $paymentStateMachineTransition = null,
+   -    private ProcessingStateMachineTransitionInterface $processingStateMachineTransition,
+   +    private ?ProcessingStateMachineTransitionInterface $processingStateMachineTransition = null,
+   )
+   ```
