@@ -13,21 +13,17 @@ declare(strict_types=1);
 
 namespace Sylius\MolliePlugin\StateMachine\Applicator;
 
+use Sylius\Abstraction\StateMachine\StateMachineInterface;
 use Sylius\Component\Core\Model\PaymentInterface;
 use Sylius\MolliePlugin\Entity\MollieSubscriptionInterface;
 use Sylius\MolliePlugin\StateMachine\MollieSubscriptionPaymentProcessingTransitions;
 use Sylius\MolliePlugin\StateMachine\MollieSubscriptionProcessingTransitions;
 use Sylius\MolliePlugin\StateMachine\MollieSubscriptionTransitions;
-use Sylius\MolliePlugin\StateMachine\Transition\PaymentStateMachineTransitionInterface;
-use Sylius\MolliePlugin\StateMachine\Transition\ProcessingStateMachineTransitionInterface;
-use Sylius\MolliePlugin\StateMachine\Transition\StateMachineTransitionInterface;
 
 final class SubscriptionAndSyliusPaymentApplicator implements SubscriptionAndSyliusPaymentApplicatorInterface
 {
     public function __construct(
-        private readonly StateMachineTransitionInterface $stateMachineTransition,
-        private readonly PaymentStateMachineTransitionInterface $paymentStateMachineTransition,
-        private readonly ProcessingStateMachineTransitionInterface $processingStateMachineTransition,
+        private readonly StateMachineInterface $stateMachine,
     ) {
     }
 
@@ -40,32 +36,51 @@ final class SubscriptionAndSyliusPaymentApplicator implements SubscriptionAndSyl
             case PaymentInterface::STATE_PROCESSING:
             case PaymentInterface::STATE_AUTHORIZED:
             case PaymentInterface::STATE_CART:
-                $this->paymentStateMachineTransition->apply(
+                $this->apply(
                     $subscription,
+                    MollieSubscriptionPaymentProcessingTransitions::GRAPH,
                     MollieSubscriptionPaymentProcessingTransitions::TRANSITION_BEGIN,
                 );
-                $this->stateMachineTransition->apply($subscription, MollieSubscriptionTransitions::TRANSITION_PROCESS);
+                $this->apply(
+                    $subscription,
+                    MollieSubscriptionTransitions::GRAPH,
+                    MollieSubscriptionTransitions::TRANSITION_PROCESS,
+                );
 
                 break;
             case PaymentInterface::STATE_COMPLETED:
                 $subscription->resetFailedPaymentCount();
-                $this->stateMachineTransition->apply($subscription, MollieSubscriptionTransitions::TRANSITION_ACTIVATE);
-                $this->paymentStateMachineTransition->apply(
+                $this->apply(
                     $subscription,
+                    MollieSubscriptionTransitions::GRAPH,
+                    MollieSubscriptionTransitions::TRANSITION_ACTIVATE,
+                );
+                $this->apply(
+                    $subscription,
+                    MollieSubscriptionPaymentProcessingTransitions::GRAPH,
                     MollieSubscriptionPaymentProcessingTransitions::TRANSITION_SUCCESS,
                 );
-                $this->processingStateMachineTransition->apply(
+                $this->apply(
                     $subscription,
+                    MollieSubscriptionProcessingTransitions::GRAPH,
                     MollieSubscriptionProcessingTransitions::TRANSITION_SCHEDULE,
                 );
 
                 break;
             default:
                 $subscription->incrementFailedPaymentCounter();
-                $this->paymentStateMachineTransition->apply(
+                $this->apply(
                     $subscription,
+                    MollieSubscriptionPaymentProcessingTransitions::GRAPH,
                     MollieSubscriptionPaymentProcessingTransitions::TRANSITION_FAILURE,
                 );
+        }
+    }
+
+    private function apply(MollieSubscriptionInterface $subscription, string $graph, string $transition): void
+    {
+        if ($this->stateMachine->can($subscription, $graph, $transition)) {
+            $this->stateMachine->apply($subscription, $graph, $transition);
         }
     }
 }

@@ -15,13 +15,13 @@ namespace Sylius\MolliePlugin\Payum\Action\Subscription;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Payum\Core\Exception\RequestNotSupportedException;
+use Sylius\Abstraction\StateMachine\StateMachineInterface;
 use Sylius\MolliePlugin\Entity\MollieSubscriptionInterface;
 use Sylius\MolliePlugin\Payum\Action\BaseApiAwareAction;
 use Sylius\MolliePlugin\Payum\Request\Subscription\StatusRecurringSubscription;
 use Sylius\MolliePlugin\StateMachine\Applicator\SubscriptionAndPaymentIdApplicatorInterface;
 use Sylius\MolliePlugin\StateMachine\Applicator\SubscriptionAndSyliusPaymentApplicatorInterface;
 use Sylius\MolliePlugin\StateMachine\MollieSubscriptionTransitions;
-use Sylius\MolliePlugin\StateMachine\Transition\StateMachineTransitionInterface;
 
 final class StatusRecurringSubscriptionAction extends BaseApiAwareAction
 {
@@ -29,7 +29,7 @@ final class StatusRecurringSubscriptionAction extends BaseApiAwareAction
         private readonly EntityManagerInterface $subscriptionManager,
         private readonly SubscriptionAndPaymentIdApplicatorInterface $subscriptionAndPaymentIdApplicator,
         private readonly SubscriptionAndSyliusPaymentApplicatorInterface $subscriptionAndSyliusPaymentApplicator,
-        private readonly StateMachineTransitionInterface $stateMachineTransition,
+        private readonly StateMachineInterface $stateMachine,
     ) {
     }
 
@@ -51,8 +51,8 @@ final class StatusRecurringSubscriptionAction extends BaseApiAwareAction
             $this->subscriptionAndSyliusPaymentApplicator->execute($subscription, $syliusPayment);
         }
 
-        $this->stateMachineTransition->apply($subscription, MollieSubscriptionTransitions::TRANSITION_COMPLETE);
-        $this->stateMachineTransition->apply($subscription, MollieSubscriptionTransitions::TRANSITION_ABORT);
+        $this->apply($subscription, MollieSubscriptionTransitions::TRANSITION_COMPLETE);
+        $this->apply($subscription, MollieSubscriptionTransitions::TRANSITION_ABORT);
 
         $this->subscriptionManager->persist($subscription);
         $this->subscriptionManager->flush();
@@ -63,5 +63,12 @@ final class StatusRecurringSubscriptionAction extends BaseApiAwareAction
         return
             $request instanceof StatusRecurringSubscription &&
             $request->getModel() instanceof MollieSubscriptionInterface;
+    }
+
+    private function apply(MollieSubscriptionInterface $subscription, string $transition): void
+    {
+        if ($this->stateMachine->can($subscription, MollieSubscriptionTransitions::GRAPH, $transition)) {
+            $this->stateMachine->apply($subscription, MollieSubscriptionTransitions::GRAPH, $transition);
+        }
     }
 }
