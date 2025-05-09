@@ -28,7 +28,7 @@ final class SubscriptionAndPaymentIdApplicator implements SubscriptionAndPayment
 {
     public function __construct(
         private readonly MollieApiClient $mollieApiClient,
-        private readonly StateMachineTransitionInterface|StateMachineInterface $stateMachineTransition,
+        private readonly StateMachineInterface|StateMachineTransitionInterface $stateMachineTransition,
         private readonly ?PaymentStateMachineTransitionInterface $paymentStateMachineTransition = null,
         private readonly ?ProcessingStateMachineTransitionInterface $processingStateMachineTransition = null,
     ) {
@@ -86,7 +86,6 @@ final class SubscriptionAndPaymentIdApplicator implements SubscriptionAndPayment
             case PaymentStatus::STATUS_OPEN:
             case PaymentStatus::STATUS_PENDING:
             case PaymentStatus::STATUS_AUTHORIZED:
-
                 $this->applyPaymentStateMachine($subscription, MollieSubscriptionPaymentProcessingTransitions::TRANSITION_BEGIN);
                 $this->applySubscriptionStateMachine($subscription, MollieSubscriptionTransitions::TRANSITION_PROCESS);
 

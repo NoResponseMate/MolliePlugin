@@ -17,6 +17,7 @@ use Sylius\Abstraction\StateMachine\StateMachineInterface;
 
 /**
  * This class is a helper for maintaining backward compatibility and will be removed in MolliePlugin 3.0.
+ *
  * @internal
  */
 final class StateMachineCompatibilityLayer

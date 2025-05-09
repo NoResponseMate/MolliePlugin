@@ -31,7 +31,7 @@ final class StatusRecurringSubscriptionAction extends BaseApiAwareAction
         private readonly EntityManagerInterface $subscriptionManager,
         private readonly SubscriptionAndPaymentIdApplicatorInterface $subscriptionAndPaymentIdApplicator,
         private readonly SubscriptionAndSyliusPaymentApplicatorInterface $subscriptionAndSyliusPaymentApplicator,
-        private readonly StateMachineTransitionInterface|StateMachineInterface $stateMachineTransition,
+        private readonly StateMachineInterface|StateMachineTransitionInterface $stateMachineTransition,
     ) {
         if ($this->stateMachineTransition instanceof StateMachineTransitionInterface) {
             trigger_deprecation(
