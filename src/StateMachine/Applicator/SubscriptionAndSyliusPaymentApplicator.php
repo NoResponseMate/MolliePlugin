@@ -26,7 +26,7 @@ use Sylius\MolliePlugin\StateMachine\Transition\StateMachineTransitionInterface;
 final class SubscriptionAndSyliusPaymentApplicator implements SubscriptionAndSyliusPaymentApplicatorInterface
 {
     public function __construct(
-        private readonly StateMachineTransitionInterface|StateMachineInterface $stateMachineTransition,
+        private readonly StateMachineInterface|StateMachineTransitionInterface $stateMachineTransition,
         private readonly ?PaymentStateMachineTransitionInterface $paymentStateMachineTransition = null,
         private readonly ?ProcessingStateMachineTransitionInterface $processingStateMachineTransition = null,
     ) {

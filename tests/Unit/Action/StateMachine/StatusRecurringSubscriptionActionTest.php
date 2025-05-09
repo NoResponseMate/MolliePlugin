@@ -131,7 +131,7 @@ final class StatusRecurringSubscriptionActionTest extends TestCase
             $this->subscriptionManagerMock,
             $this->subscriptionAndPaymentIdApplicatorMock,
             $this->subscriptionAndSyliusPaymentApplicatorMock,
-            $stateMachine
+            $stateMachine,
         );
 
         $requestMock = $this->createMock(StatusRecurringSubscription::class);

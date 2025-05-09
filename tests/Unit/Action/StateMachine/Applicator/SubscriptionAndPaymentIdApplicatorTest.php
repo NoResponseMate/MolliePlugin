@@ -173,7 +173,6 @@ final class SubscriptionAndPaymentIdApplicatorTest extends TestCase
         $stateMachine = $this->createMock(StateMachineInterface::class);
         $this->subscriptionAndPaymentIdApplicator = new SubscriptionAndPaymentIdApplicator($this->mollieApiClientMock, $stateMachine);
 
-
         $subscriptionMock = $this->createMock(MollieSubscriptionInterface::class);
         $configurationMock = $this->createMock(MollieSubscriptionConfigurationInterface::class);
         $paymentEndpointMock = $this->createMock(PaymentEndpoint::class);
