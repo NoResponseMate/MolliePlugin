@@ -15,6 +15,7 @@ namespace Tests\Sylius\MolliePlugin\Unit\Action\StateMachine;
 
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
+use Sylius\Abstraction\StateMachine\StateMachineInterface;
 use Sylius\Component\Core\Model\PaymentInterface;
 use Sylius\MolliePlugin\Entity\MollieSubscriptionInterface;
 use Sylius\MolliePlugin\Payum\Action\Subscription\StatusRecurringSubscriptionAction;
@@ -121,5 +122,34 @@ final class StatusRecurringSubscriptionActionTest extends TestCase
 
         $requestMock->expects($this->once())->method('getModel')->willReturn($subscriptionMock);
         $this->assertTrue($this->statusRecurringSubscriptionAction->supports($requestMock));
+    }
+
+    public function testAppliesAbortTransitionWithAbstractStateMachine(): void
+    {
+        $stateMachine = $this->createMock(StateMachineInterface::class);
+        $this->statusRecurringSubscriptionAction = new StatusRecurringSubscriptionAction(
+            $this->subscriptionManagerMock,
+            $this->subscriptionAndPaymentIdApplicatorMock,
+            $this->subscriptionAndSyliusPaymentApplicatorMock,
+            $stateMachine,
+        );
+
+        $requestMock = $this->createMock(StatusRecurringSubscription::class);
+        $subscriptionMock = $this->createMock(MollieSubscriptionInterface::class);
+
+        $requestMock->expects($this->exactly(2))->method('getModel')->willReturn($subscriptionMock);
+        $requestMock->expects($this->once())->method('getPaymentId')->willReturn(null);
+        $requestMock->expects($this->once())->method('getPayment')->willReturn(null);
+
+        $stateMachine->method('can')->willReturn(true);
+        $stateMachine->expects($this->exactly(2))->method('apply')->withConsecutive(
+            [$subscriptionMock, MollieSubscriptionTransitions::GRAPH, MollieSubscriptionTransitions::TRANSITION_COMPLETE],
+            [$subscriptionMock, MollieSubscriptionTransitions::GRAPH, MollieSubscriptionTransitions::TRANSITION_ABORT],
+        );
+
+        $this->subscriptionManagerMock->expects($this->once())->method('persist')->with($subscriptionMock);
+        $this->subscriptionManagerMock->expects($this->once())->method('flush');
+
+        $this->statusRecurringSubscriptionAction->execute($requestMock);
     }
 }
