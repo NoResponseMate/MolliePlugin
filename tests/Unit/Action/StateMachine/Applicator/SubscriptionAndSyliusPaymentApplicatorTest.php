@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Tests\Sylius\MolliePlugin\Unit\Action\StateMachine\Applicator;
 
 use PHPUnit\Framework\TestCase;
+use Sylius\Abstraction\StateMachine\StateMachineInterface;
 use Sylius\Component\Core\Model\PaymentInterface;
 use Sylius\MolliePlugin\Entity\MollieSubscriptionInterface;
 use Sylius\MolliePlugin\StateMachine\Applicator\SubscriptionAndSyliusPaymentApplicator;
@@ -21,26 +22,17 @@ use Sylius\MolliePlugin\StateMachine\Applicator\SubscriptionAndSyliusPaymentAppl
 use Sylius\MolliePlugin\StateMachine\MollieSubscriptionPaymentProcessingTransitions;
 use Sylius\MolliePlugin\StateMachine\MollieSubscriptionProcessingTransitions;
 use Sylius\MolliePlugin\StateMachine\MollieSubscriptionTransitions;
-use Sylius\MolliePlugin\StateMachine\Transition\PaymentStateMachineTransitionInterface;
-use Sylius\MolliePlugin\StateMachine\Transition\ProcessingStateMachineTransitionInterface;
-use Sylius\MolliePlugin\StateMachine\Transition\StateMachineTransitionInterface;
 
 final class SubscriptionAndSyliusPaymentApplicatorTest extends TestCase
 {
-    private StateMachineTransitionInterface $stateMachineTransitionMock;
-
-    private PaymentStateMachineTransitionInterface $paymentStateMachineTransitionMock;
-
-    private ProcessingStateMachineTransitionInterface $processingStateMachineTransitionMock;
+    private StateMachineInterface $stateMachineMock;
 
     private SubscriptionAndSyliusPaymentApplicator $subscriptionAndSyliusPaymentApplicator;
 
     protected function setUp(): void
     {
-        $this->stateMachineTransitionMock = $this->createMock(StateMachineTransitionInterface::class);
-        $this->paymentStateMachineTransitionMock = $this->createMock(PaymentStateMachineTransitionInterface::class);
-        $this->processingStateMachineTransitionMock = $this->createMock(ProcessingStateMachineTransitionInterface::class);
-        $this->subscriptionAndSyliusPaymentApplicator = new SubscriptionAndSyliusPaymentApplicator($this->stateMachineTransitionMock, $this->paymentStateMachineTransitionMock, $this->processingStateMachineTransitionMock);
+        $this->stateMachineMock = $this->createMock(StateMachineInterface::class);
+        $this->subscriptionAndSyliusPaymentApplicator = new SubscriptionAndSyliusPaymentApplicator($this->stateMachineMock);
     }
 
     public function testImplementInterface(): void
@@ -54,8 +46,22 @@ final class SubscriptionAndSyliusPaymentApplicatorTest extends TestCase
         $paymentMock = $this->createMock(PaymentInterface::class);
 
         $paymentMock->expects($this->once())->method('getState')->willReturn(PaymentInterface::STATE_NEW);
-        $this->paymentStateMachineTransitionMock->expects($this->once())->method('apply')->with($subscriptionMock, MollieSubscriptionPaymentProcessingTransitions::TRANSITION_BEGIN);
-        $this->stateMachineTransitionMock->expects($this->once())->method('apply')->with($subscriptionMock, MollieSubscriptionTransitions::TRANSITION_PROCESS);
+
+        $this->stateMachineMock->method('can')
+            ->willReturnMap([
+                [$subscriptionMock, MollieSubscriptionPaymentProcessingTransitions::GRAPH, MollieSubscriptionPaymentProcessingTransitions::TRANSITION_BEGIN, true],
+                [$subscriptionMock, MollieSubscriptionTransitions::GRAPH, MollieSubscriptionTransitions::TRANSITION_PROCESS, true],
+            ])
+        ;
+
+        $this->stateMachineMock->expects($this->exactly(2))
+            ->method('apply')
+            ->withConsecutive(
+                [$subscriptionMock, MollieSubscriptionPaymentProcessingTransitions::GRAPH, MollieSubscriptionPaymentProcessingTransitions::TRANSITION_BEGIN],
+                [$subscriptionMock, MollieSubscriptionTransitions::GRAPH, MollieSubscriptionTransitions::TRANSITION_PROCESS],
+            )
+        ;
+
         $this->subscriptionAndSyliusPaymentApplicator->execute($subscriptionMock, $paymentMock);
     }
 
@@ -65,8 +71,22 @@ final class SubscriptionAndSyliusPaymentApplicatorTest extends TestCase
         $paymentMock = $this->createMock(PaymentInterface::class);
 
         $paymentMock->expects($this->once())->method('getState')->willReturn(PaymentInterface::STATE_PROCESSING);
-        $this->paymentStateMachineTransitionMock->expects($this->once())->method('apply')->with($subscriptionMock, MollieSubscriptionPaymentProcessingTransitions::TRANSITION_BEGIN);
-        $this->stateMachineTransitionMock->expects($this->once())->method('apply')->with($subscriptionMock, MollieSubscriptionTransitions::TRANSITION_PROCESS);
+
+        $this->stateMachineMock->method('can')
+            ->willReturnMap([
+                [$subscriptionMock, MollieSubscriptionPaymentProcessingTransitions::GRAPH, MollieSubscriptionPaymentProcessingTransitions::TRANSITION_BEGIN, true],
+                [$subscriptionMock, MollieSubscriptionTransitions::GRAPH, MollieSubscriptionTransitions::TRANSITION_PROCESS, true],
+            ])
+        ;
+
+        $this->stateMachineMock->expects($this->exactly(2))
+            ->method('apply')
+            ->withConsecutive(
+                [$subscriptionMock, MollieSubscriptionPaymentProcessingTransitions::GRAPH, MollieSubscriptionPaymentProcessingTransitions::TRANSITION_BEGIN],
+                [$subscriptionMock, MollieSubscriptionTransitions::GRAPH, MollieSubscriptionTransitions::TRANSITION_PROCESS],
+            )
+        ;
+
         $this->subscriptionAndSyliusPaymentApplicator->execute($subscriptionMock, $paymentMock);
     }
 
@@ -76,8 +96,22 @@ final class SubscriptionAndSyliusPaymentApplicatorTest extends TestCase
         $paymentMock = $this->createMock(PaymentInterface::class);
 
         $paymentMock->expects($this->once())->method('getState')->willReturn(PaymentInterface::STATE_AUTHORIZED);
-        $this->paymentStateMachineTransitionMock->expects($this->once())->method('apply')->with($subscriptionMock, MollieSubscriptionPaymentProcessingTransitions::TRANSITION_BEGIN);
-        $this->stateMachineTransitionMock->expects($this->once())->method('apply')->with($subscriptionMock, MollieSubscriptionTransitions::TRANSITION_PROCESS);
+
+        $this->stateMachineMock->method('can')
+            ->willReturnMap([
+                [$subscriptionMock, MollieSubscriptionPaymentProcessingTransitions::GRAPH, MollieSubscriptionPaymentProcessingTransitions::TRANSITION_BEGIN, true],
+                [$subscriptionMock, MollieSubscriptionTransitions::GRAPH, MollieSubscriptionTransitions::TRANSITION_PROCESS, true],
+            ])
+        ;
+
+        $this->stateMachineMock->expects($this->exactly(2))
+            ->method('apply')
+            ->withConsecutive(
+                [$subscriptionMock, MollieSubscriptionPaymentProcessingTransitions::GRAPH, MollieSubscriptionPaymentProcessingTransitions::TRANSITION_BEGIN],
+                [$subscriptionMock, MollieSubscriptionTransitions::GRAPH, MollieSubscriptionTransitions::TRANSITION_PROCESS],
+            )
+        ;
+
         $this->subscriptionAndSyliusPaymentApplicator->execute($subscriptionMock, $paymentMock);
     }
 
@@ -87,8 +121,22 @@ final class SubscriptionAndSyliusPaymentApplicatorTest extends TestCase
         $paymentMock = $this->createMock(PaymentInterface::class);
 
         $paymentMock->expects($this->once())->method('getState')->willReturn(PaymentInterface::STATE_CART);
-        $this->paymentStateMachineTransitionMock->expects($this->once())->method('apply')->with($subscriptionMock, MollieSubscriptionPaymentProcessingTransitions::TRANSITION_BEGIN);
-        $this->stateMachineTransitionMock->expects($this->once())->method('apply')->with($subscriptionMock, MollieSubscriptionTransitions::TRANSITION_PROCESS);
+
+        $this->stateMachineMock->method('can')
+            ->willReturnMap([
+                [$subscriptionMock, MollieSubscriptionPaymentProcessingTransitions::GRAPH, MollieSubscriptionPaymentProcessingTransitions::TRANSITION_BEGIN, true],
+                [$subscriptionMock, MollieSubscriptionTransitions::GRAPH, MollieSubscriptionTransitions::TRANSITION_PROCESS, true],
+            ])
+        ;
+
+        $this->stateMachineMock->expects($this->exactly(2))
+            ->method('apply')
+            ->withConsecutive(
+                [$subscriptionMock, MollieSubscriptionPaymentProcessingTransitions::GRAPH, MollieSubscriptionPaymentProcessingTransitions::TRANSITION_BEGIN],
+                [$subscriptionMock, MollieSubscriptionTransitions::GRAPH, MollieSubscriptionTransitions::TRANSITION_PROCESS],
+            )
+        ;
+
         $this->subscriptionAndSyliusPaymentApplicator->execute($subscriptionMock, $paymentMock);
     }
 
@@ -99,9 +147,24 @@ final class SubscriptionAndSyliusPaymentApplicatorTest extends TestCase
 
         $paymentMock->expects($this->once())->method('getState')->willReturn(PaymentInterface::STATE_COMPLETED);
         $subscriptionMock->expects($this->once())->method('resetFailedPaymentCount');
-        $this->stateMachineTransitionMock->expects($this->once())->method('apply')->with($subscriptionMock, MollieSubscriptionTransitions::TRANSITION_ACTIVATE);
-        $this->paymentStateMachineTransitionMock->expects($this->once())->method('apply')->with($subscriptionMock, MollieSubscriptionPaymentProcessingTransitions::TRANSITION_SUCCESS);
-        $this->processingStateMachineTransitionMock->expects($this->once())->method('apply')->with($subscriptionMock, MollieSubscriptionProcessingTransitions::TRANSITION_SCHEDULE);
+
+        $this->stateMachineMock->method('can')
+            ->willReturnMap([
+                [$subscriptionMock, MollieSubscriptionTransitions::GRAPH, MollieSubscriptionTransitions::TRANSITION_ACTIVATE, true],
+                [$subscriptionMock, MollieSubscriptionPaymentProcessingTransitions::GRAPH, MollieSubscriptionPaymentProcessingTransitions::TRANSITION_SUCCESS, true],
+                [$subscriptionMock, MollieSubscriptionProcessingTransitions::GRAPH, MollieSubscriptionProcessingTransitions::TRANSITION_SCHEDULE, true],
+            ])
+        ;
+
+        $this->stateMachineMock->expects($this->exactly(3))
+            ->method('apply')
+            ->withConsecutive(
+                [$subscriptionMock, MollieSubscriptionTransitions::GRAPH, MollieSubscriptionTransitions::TRANSITION_ACTIVATE],
+                [$subscriptionMock, MollieSubscriptionPaymentProcessingTransitions::GRAPH, MollieSubscriptionPaymentProcessingTransitions::TRANSITION_SUCCESS],
+                [$subscriptionMock, MollieSubscriptionProcessingTransitions::GRAPH, MollieSubscriptionProcessingTransitions::TRANSITION_SCHEDULE],
+            )
+        ;
+
         $this->subscriptionAndSyliusPaymentApplicator->execute($subscriptionMock, $paymentMock);
     }
 
@@ -112,7 +175,20 @@ final class SubscriptionAndSyliusPaymentApplicatorTest extends TestCase
 
         $paymentMock->expects($this->once())->method('getState')->willReturn('definitely not state');
         $subscriptionMock->expects($this->once())->method('incrementFailedPaymentCounter');
-        $this->paymentStateMachineTransitionMock->expects($this->once())->method('apply')->with($subscriptionMock, MollieSubscriptionPaymentProcessingTransitions::TRANSITION_FAILURE);
+
+        $this->stateMachineMock->method('can')
+            ->willReturnMap([
+                [$subscriptionMock, MollieSubscriptionPaymentProcessingTransitions::GRAPH, MollieSubscriptionPaymentProcessingTransitions::TRANSITION_FAILURE, true],
+            ])
+        ;
+
+        $this->stateMachineMock->expects($this->once())
+            ->method('apply')
+            ->withConsecutive(
+                [$subscriptionMock, MollieSubscriptionPaymentProcessingTransitions::GRAPH, MollieSubscriptionPaymentProcessingTransitions::TRANSITION_FAILURE],
+            )
+        ;
+
         $this->subscriptionAndSyliusPaymentApplicator->execute($subscriptionMock, $paymentMock);
     }
 }

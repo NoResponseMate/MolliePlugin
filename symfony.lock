@@ -587,5 +587,8 @@
         "files": [
             "config/routes/js_translation.yaml"
         ]
+    },
+    "winzou/state-machine-bundle": {
+        "version": "v0.6.2"
     }
 }
